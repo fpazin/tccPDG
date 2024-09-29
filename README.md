@@ -1,5 +1,3 @@
-# Rep tccPDG
-
 # Projeto: [PDG - Project Documentation Generator]
 
 ## Descrição
