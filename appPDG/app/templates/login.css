@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e6e9fc;
+}
+
+.container {
+    display: flex;
+    width: 800px;
+    height: 500px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.left-section {
+    background-color: #1c1c1c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+}
+
+.logo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.right-section {
+    width: 50%;
+    padding: 40px;
+    background-color: #f7f8ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px; /* Tamanho da fonte dos textos dentro do input */
+    color: #333; /* Cor do texto */
+}
+
+input::placeholder {
+    font-size: 16px; /* Defina o tamanho da fonte desejado */
+    color: #999; /* Opcional: ajuste a cor do placeholder para consistência */
+}
+
+.input-group {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+label {
+    font-size: 14px;
+    color: #666;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="password"] {
+    font-size: 18px;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.options a {
+    color: #666;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.options input {
+    margin-right: 10px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.btn.google-login {
+    background-color: #4285F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.google-login:before {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+    margin-right: 10px;
+}
+
+.divider {
+    margin: 20px 0;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.signup {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+    margin-top: 15px;
+}

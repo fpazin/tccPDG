@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Login</title>
+    <link rel="stylesheet" href= "login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="right-section">
+            <h1>Olá, Boas-Vindas!</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="login">Login</label>
+                    <input type="text" id="login" name="login" placeholder="E-mail ou número de telefone">
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Digite a senha">
+                </div>
+                <div class="options">                    
+                    <a href="#">Esqueceu sua senha?</a>
+                </div>
+                <button type="submit" class="btn">Entrar</button>
+                <div class="divider"></div>
+                <button type="button" class="btn google-login">Ou faça login com o Google</button>
+            </form>
+            <a href="#" class="signup">Inscreva-se agora</a>
+        </div>
+    </div>
+</body>
+</html>
