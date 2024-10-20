@@ -13,6 +13,7 @@
   />
 </div>
 <div class="right-section">
+  
   <form method="post" class="form-group">
     {% csrf_token %}
     <h1>Página de Cadastro</h1>
@@ -20,20 +21,24 @@
     <!-- Para exibir erros gerais do formulário -->
     <div class="input-group">
       <label for="id_username">Usuário</label>
+      {{ user_form.username.errors }}
       {{ user_form.username }}
       <!-- Campo de Username -->
     </div>
     <div class="input-group">
       <label for="id_password1">Senha</label>
+      {{ user_form.password1.errors }}
       {{ user_form.password1 }}
       <!-- Campo de Senha -->
     </div>
     <div class="input-group">
       <label for="id_password2">Confirmar Senha</label>
+      {{ user_form.password2.errors }}
       {{ user_form.password2 }}
       <!-- Campo de Confirmação de Senha -->
     </div>
     <button type="submit" class="btn">Cadastrar</button>
+    <a href="{% url 'login' %}" class="signup">Já tem uma conta? Faça login</a>
     <div class="divider"></div>
     <button type="button" class="btn google-login">
       Ou faça login com o Google

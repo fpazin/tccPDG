@@ -1,4 +1,5 @@
 # Linha de comando para instalar as dependências do projeto
+#Acesso.11
 # pip install -r requirements.txt
 
 # Lista de dependências do projeto

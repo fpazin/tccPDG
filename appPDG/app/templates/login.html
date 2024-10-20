@@ -192,7 +192,7 @@
           {% csrf_token %}
           <div class="input-group">
             <label for="login">Login</label>
-            <input type="text" id="login" name="login" placeholder="E-mail" />
+            <input type="text" id="login" name="login" placeholder="Digite o seu usuário" />
           </div>
           <div class="input-group">
             <label for="password">Senha</label>
@@ -212,7 +212,7 @@
             Ou faça login com o Google
           </button>
         </form>
-        <a href="#" class="signup">Inscreva-se agora</a>
+        <a href="{% url 'register' %}" class="signup">Inscreva-se agora</a>
       </div>
     </div>
     <footer>
