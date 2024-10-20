@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<style>
+  body {
+    background-color: #e6e9fc; /* mesma cor de fundo da página de login */
+  }
+</style>
+<div class="left-section">
+  <img
+    class="logo"
+    src="{% static 'images/imagemPDG4.png' %}"
+    alt="Logo"
+    style="width: 120px; height: 80px; border-radius: 0"
+  />
+</div>
+<div class="right-section">
+  <form method="post" class="form-group">
+    {% csrf_token %}
+    <h1>Página de Cadastro</h1>
+    {{ user_form.non_field_errors }}
+    <!-- Para exibir erros gerais do formulário -->
+    <div class="input-group">
+      <label for="id_username">Usuário</label>
+      {{ user_form.username }}
+      <!-- Campo de Username -->
+    </div>
+    <div class="input-group">
+      <label for="id_password1">Senha</label>
+      {{ user_form.password1 }}
+      <!-- Campo de Senha -->
+    </div>
+    <div class="input-group">
+      <label for="id_password2">Confirmar Senha</label>
+      {{ user_form.password2 }}
+      <!-- Campo de Confirmação de Senha -->
+    </div>
+    <button type="submit" class="btn">Cadastrar</button>
+    <div class="divider"></div>
+    <button type="button" class="btn google-login">
+      Ou faça login com o Google
+    </button>
+  </form>
+</div>
+{% endblock %}
