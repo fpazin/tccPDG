@@ -1,37 +1,222 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Login</title>
-    <link rel="stylesheet" href= "login.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Página de Login PDG</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Arial", sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #e6e9fc;
+    }
+
+    .container {
+      display: flex;
+      width: 800px;
+      height: 500px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .left-section {
+      background-color: #1c1c1c;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 50%;
+      padding: 20px;
+    }
+    .descricao {
+      color: #fff; /* Cor do texto para ser visível no fundo escuro */
+      text-align: center; /* Centraliza o texto */
+
+      max-width: 250px; /* Limita a largura da descrição */
+      font-size: 16px; /* Tamanho da fonte da descrição */
+      line-height: 1.5; /* Espaçamento entre as linhas para melhor leitura */
+    }
+
+    .logo {
+      width: 400px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .right-section {
+      width: 50%;
+      padding: 40px;
+      background-color: #f7f8ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px; /* Tamanho da fonte dos textos dentro do input */
+      color: #333; /* Cor do texto */
+    }
+
+    input::placeholder {
+      font-size: 16px; /* Defina o tamanho da fonte desejado */
+      color: #999; /* Opcional: ajuste a cor do placeholder para consistência */
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input[type="password"] {
+      font-size: 18px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .options a {
+      color: #666;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .options input {
+      margin-right: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #333;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn.google-login {
+      background-color: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn.google-login:before {
+      content: url("https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg");
+      margin-right: 10px;
+    }
+
+    .divider {
+      margin: 20px 0;
+      height: 1px;
+      background-color: #ccc;
+    }
+
+    .signup {
+      display: block;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      text-decoration: none;
+      margin-top: 15px;
+    }
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      background-color: #333;
+      color: white;
+      font-size: 14px;
+    }
+  </style>
+
+  <body>
     <div class="container">
-        <div class="left-section">
-            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
-        </div>
-        <div class="right-section">
-            <h1>Olá, Boas-Vindas!</h1>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="input-group">
-                    <label for="login">Login</label>
-                    <input type="text" id="login" name="login" placeholder="E-mail ou número de telefone">
-                </div>
-                <div class="input-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" placeholder="Digite a senha">
-                </div>
-                <div class="options">                    
-                    <a href="#">Esqueceu sua senha?</a>
-                </div>
-                <button type="submit" class="btn">Entrar</button>
-                <div class="divider"></div>
-                <button type="button" class="btn google-login">Ou faça login com o Google</button>
-            </form>
-            <a href="#" class="signup">Inscreva-se agora</a>
-        </div>
+      <div class="left-section">
+        <img
+          src="{% static 'images/imagemPDG4.png' %}"
+          alt="Logo"
+          class="logo"
+        />
+        <p class="descricao">
+          Bem-vindo ao PDG! Uma plataforma automatizada de criação de
+          documentação integrada com uma IA.
+        </p>
+      </div>
+      <div class="right-section">
+        <h1>Olá, Boas-Vindas!</h1>
+        <form method="POST">
+          {% csrf_token %}
+          <div class="input-group">
+            <label for="login">Login</label>
+            <input type="text" id="login" name="login" placeholder="E-mail" />
+          </div>
+          <div class="input-group">
+            <label for="password">Senha</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Digite a senha"
+            />
+          </div>
+          <div class="options">
+            <a href="#">Esqueceu sua senha?</a>
+          </div>
+          <button type="submit" class="btn">Entrar</button>
+          <div class="divider"></div>
+          <button type="button" class="btn google-login">
+            Ou faça login com o Google
+          </button>
+        </form>
+        <a href="#" class="signup">Inscreva-se agora</a>
+      </div>
     </div>
-</body>
+    <footer>
+      <p>&copy; 2024 PDG. Todos os direitos reservados.</p>
+    </footer>
+  </body>
 </html>
