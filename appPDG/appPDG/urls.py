@@ -16,12 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import login, PDG_view
-from accounts.views import register_view
+from app.views import PDG_view
+from accounts.views import register_view, login, logout_view
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login, name='login'),
+    path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
     path('PDG/', PDG_view, name='PDG'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,10 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
-    <link rel="stylesheet" href="base.css" />
   </head>
   <style>
     * {
@@ -106,29 +106,39 @@
     }
   </style>
   <body>
-    <div class="container">
+    <div class="container">      
       <aside class="sidebar">
-        <button class="novo-projeto">+ Novo Projeto</button>
+        {% if user.is_authenticated %}
+          <button class="novo-projeto">+ Novo Projeto</button>
+        {% endif %}
         <ul class="projetos-lista"></ul>
         <div class="sidebar-footer">
-          <button class="excluir-projetos">Excluir Projetos</button>
-          <button class="minha-conta">Minha Conta</button>
-          <button class="log-out">Log out</button>
+            <h3>Olá, {{ user.username }}</h3>
+            <button class="excluir-projetos">Excluir Projetos</button>
+            <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>          
         </div>
       </aside>
 
       <main class="main-content">
-        <div class="logo">LOGO</div>
-        <p class="descricao">
-          Lorem Ipsum é simplesmente uma simulação de texto da indústria
-          tipográfica e de impressos, e vem sendo utilizado desde o século XVI,
-          quando um impressor desconhecido pegou uma bandeja de tipos e os
-          embaralhou para fazer um livro de modelos de tipos.
-        </p>
-        <div class="botoes">
-          <button class="btn-novo-projeto">+ Novo Projeto</button>
-          <button class="btn-meus-projetos">+ Meus Projetos</button>
+        <div>
+          <a href="{% url 'login' %}">
+            <img
+              src="{% static 'images/imagemPDG4.png' %}"
+              alt="Logo"
+              class="logo"
+            />
+          </a>
         </div>
+        <p class="descricao">
+          O PDG, Project Documentation Generator, é uma ferramenta que gera a documentação de projetos a partir de perguntas pré-definidas. 
+          Com o PDG, você será guiado por um processo baseado no PMBOK com perguntas que auxiliam a documentar o projeto de forma rápida e prática com a ajuda de uma IA.        
+        </p>
+        {% if user.is_authenticated %}
+          <div class="botoes">
+            <button class="btn-novo-projeto">+ Novo Projeto</button>
+            <button class="btn-meus-projetos">+ Meus Projetos</button>
+          </div>
+        {% endif %}        
       </main>
     </div>
   </body>
