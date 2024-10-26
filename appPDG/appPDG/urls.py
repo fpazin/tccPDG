@@ -16,15 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import PDG_view
-from accounts.views import register_view, login, logout_view
+# from app.views import PDG_view
+from app.views import page_test, pdg_view
+from accounts.views import register_view, login, logout_view, login_view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', login, name='login'),
+    path('', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
-    path('PDG/', PDG_view, name='PDG'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('PDG/', pdg_view, name='PDG'),
+    path('1/', page_test, name='page_test'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -56,7 +56,7 @@ ROOT_URLCONF = 'appPDG.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['app/templates'],  # Garanta que esta linha esteja correta
+        'DIRS': ['templates'],  # Garanta que esta linha esteja correta
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

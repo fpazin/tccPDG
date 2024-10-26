@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %} <!-- Load the static template tag -->
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
@@ -104,18 +104,34 @@
     .btn-meus-projetos:hover {
       background-color: #574fd1;
     }
+    a.log-in {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6d64fd;  /* Cor de fundo do botão */
+    color: white;               /* Cor do texto */
+    text-decoration: none;      /* Remove o sublinhado */
+    border-radius: 10px;        /* Bordas arredondadas */
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease; /* Transição para o hover */
+    }
+
+    a.log-in:hover {
+        background-color: #574fd1; /* Cor ao passar o mouse */
+    }
   </style>
   <body>
     <div class="container">      
       <aside class="sidebar">
-        {% if user.is_authenticated %}
           <button class="novo-projeto">+ Novo Projeto</button>
-        {% endif %}
         <ul class="projetos-lista"></ul>
         <div class="sidebar-footer">
-            <h3>Olá, {{ user.username }}</h3>
-            <button class="excluir-projetos">Excluir Projetos</button>
-            <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>          
+          {% if user.is_authenticated %}
+          <p>Olá, {{ user.username | title }} !</p>
+            <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>    
+          {% else %}
+            <a href="{% url 'login' %}" class="log-in">Log in</a>
+          {% endif %}                
         </div>
       </aside>
 
@@ -133,12 +149,9 @@
           O PDG, Project Documentation Generator, é uma ferramenta que gera a documentação de projetos a partir de perguntas pré-definidas. 
           Com o PDG, você será guiado por um processo baseado no PMBOK com perguntas que auxiliam a documentar o projeto de forma rápida e prática com a ajuda de uma IA.        
         </p>
-        {% if user.is_authenticated %}
           <div class="botoes">
             <button class="btn-novo-projeto">+ Novo Projeto</button>
-            <button class="btn-meus-projetos">+ Meus Projetos</button>
-          </div>
-        {% endif %}        
+          </div>     
       </main>
     </div>
   </body>
