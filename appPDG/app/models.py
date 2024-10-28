@@ -1,7 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
-
-# Create your models here.
+from django.db import models
 
 class Projeto(models.Model):
     nome = models.CharField(max_length=255)
@@ -20,7 +18,8 @@ class Pergunta(models.Model):
 class Resposta(models.Model):
     projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE, related_name='respostas')
     pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE, related_name='respostas')
-    resposta_texto = models.TextField(blank=True, null=True)  # Campo onde o usuário salvará a resposta gerada pela IA
+    resposta_texto = models.TextField(blank=True, null=True)  # Campo para a resposta do usuário
 
     def __str__(self):
         return f'Resposta para: {self.pergunta.texto[:50]}'
+
