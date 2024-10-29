@@ -160,7 +160,7 @@
     }
     .sidebar-complementar {
       width: 250px;
-      background-color: #3c3c3c;
+      background-color: #2c2c2c;
       padding: 20px;
       color: white;
       position: fixed;
@@ -168,14 +168,34 @@
       top: 0;
       bottom: 0;
       display: nome;
+      overflow-y: auto;
     }
     .sidebar-complementar h2 {
       margin-bottom: 10px;
     }
 
     .sidebar-complementar ul {
-      list-style: none;
+
+      overflow-y: auto; /* Habilita a rolagem somente na lista de perguntas */
       padding: 0;
+    }
+    .sidebar-complementar ul li {
+      margin: 8px 0;
+    }
+    .sidebar-complementar ul li a:hover {
+      background-color: #574fd1;
+      transform: scale(1.05);
+    }
+    .sidebar-complementar ul li a {
+      display: block;
+      background-color: #6d64fd;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
     .projetos-lista {
       list-style: none;
@@ -207,7 +227,6 @@
   function abrirModal() {
     document.getElementById("modal-novo-projeto").style.display = "flex";
   }
-
   function fecharModal() {
     document.getElementById("modal-novo-projeto").style.display = "none";
   }
@@ -247,27 +266,31 @@
   }
   function carregarPerguntas(projetoId) {
     fetch(`/projeto/${projetoId}/`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro ao carregar perguntas");
+            }
+            return response.json();
+        })
         .then(data => {
-            // Atualizar o título da sidebar complementar
             document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
-
-            // Limpar perguntas antigas
             const listaPerguntas = document.querySelector(".sidebar-complementar ul");
             listaPerguntas.innerHTML = "";
 
-            // Adicionar perguntas do projeto selecionado
             data.perguntas.forEach(pergunta => {
                 const li = document.createElement("li");
-                li.textContent = pergunta.texto;
+                const link = document.createElement("a");
+                link.textContent = pergunta.texto;
+                link.href = `/pergunta/${pergunta.id}/`; // Link para página de interação de cada pergunta
+                li.appendChild(link);
                 listaPerguntas.appendChild(li);
             });
 
-            // Mostrar a sidebar complementar se estiver oculta
             document.querySelector(".sidebar-complementar").style.display = "block";
         })
         .catch(error => console.error("Erro ao carregar perguntas:", error));
-  }
+    }
+
   </script>
   <body>
     <div class="container">
@@ -280,7 +303,7 @@
         </div>
       </div>      
       <aside class="sidebar">
-          <button class="novo-projeto">+ Novo Projeto</button>
+          <button class="novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
           <ul class="projetos-lista">
             {% for projeto in projetos %}
                 <li><a href="javascript:void(0);" onclick="carregarPerguntas( {{ projeto.id }} )">{{ projeto.nome }}</a></li>

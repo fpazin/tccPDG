@@ -61,9 +61,21 @@ class projectListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Projeto.objects.filter(usuario=self.request.user)
+        return Projeto.objects.filter(usuario=self.request.user).order_by('-data_criacao')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['perguntas'] = Pergunta.objects.all()
         return context
+    
+def perguntas_do_projeto(request, projeto_id):
+    projeto = get_object_or_404(Projeto, id=projeto_id, usuario=request.user)
+    perguntas = Pergunta.objects.values('texto')
+    return JsonResponse({
+        'projeto_nome': projeto.nome,
+        'perguntas': list(perguntas)
+    })
+
+def interagir_com_pergunta(request, pergunta_id):
+    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
+    return render(request, 'interacao_pergunta.html', {'pergunta': pergunta})
