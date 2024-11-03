@@ -92,7 +92,7 @@ textarea {
   color: white;
 }
 
-.btn-salvar, .btn-enviar {
+.btn-salvar, .btn-enviar, .btn-next, .btn-previous {
   background-color: #6d64fd;
   color: white;
   border: none;
@@ -103,7 +103,7 @@ textarea {
   margin-top: 10px;
 }
 
-.btn-salvar:hover, .btn-enviar:hover {
+.btn-salvar:hover, .btn-enviar:hover, .btn-next:hover, .btn-previous:hover {
   background-color: #574fd1;
 }
 

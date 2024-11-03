@@ -49,6 +49,17 @@
     })
     .catch(error => console.error("Erro:", error));
   }
+      // Funções para navegação entre perguntas
+  function irParaPerguntaAnterior(projetoId, perguntaId) {
+      if (perguntaId => 1) {
+          window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId - 1}/`;
+      }
+  }
+  function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
+      if (perguntaId < maxPerguntaId) {
+          window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId + 1}/`;
+      }
+  }
   function carregarPerguntas(projetoId) {
         fetch(`/projeto/${projetoId}/`)
             .then(response => {
@@ -94,7 +105,8 @@
             <div class="sidebar-footer">
                 {% if user.is_authenticated %}
                     <p>Olá, {{ user.username | title }} !</p>
-                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Log out</button>
+                    <button onclick="window.location.href={% url 'PDG' %}">Início</button>    
+                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Sair</button>
                 {% else %}
                     <a href="{% url 'login' %}" class="log-in">Log in</a>
                 {% endif %}
@@ -105,11 +117,14 @@
         <main class="main-content">
             <!-- Top Section with Textarea and Save Button -->
             <div class="top-section">
+                <h2>Projeto: {{ projeto.nome }}</h2>
                 <h1>{{ pergunta.texto }}</h1>
                 <form method="post" action="">
                     {% csrf_token %}
                     <textarea name="resposta_texto" rows="5" placeholder="O que deseja salvar?">{{ resposta.resposta_texto }}</textarea>
+                    <button type="button" onclick="irParaPerguntaAnterior({{ projeto.id }}, {{ pergunta.id }})" class="btn-previous">Pergunta Anterior</button>
                     <button type="submit" class="btn-salvar">Salvar</button>
+                    <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
                 </form>
             </div>
 
@@ -117,7 +132,7 @@
             <div class="bottom-section">
                 <div class="interacao">
                     <input type="text" placeholder="Digite sua mensagem..." />
-                    <button class="btn-enviar">Send</button>
+                    <button class="btn-enviar">Enviar</button>
                 </div>
             </div>
         </main>

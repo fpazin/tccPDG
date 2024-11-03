@@ -231,7 +231,7 @@ textarea {
     font-size: 1em;
 }
 
-.btn-salvar, .btn-enviar {
+.btn-salvar, .btn-enviar, btn-next {
     background-color: #6d64fd;
     color: white;
     border: none;
@@ -242,11 +242,11 @@ textarea {
     margin-top: 10px;
 }
 
-.btn-salvar:hover, .btn-enviar:hover {
+.btn-salvar:hover, .btn-enviar:hover, btn-next:hover {
   background-color: #574fd1;
 }
 
-.btn-salvar {
+.btn-salvar, .btn-enviar, btn-next {
   display: inline-block;
   width: 100px;
   text-align: center;

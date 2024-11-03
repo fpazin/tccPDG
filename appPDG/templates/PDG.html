@@ -85,11 +85,11 @@
   <body>
     <div class="container">
       <div id="modal-novo-projeto" class="modal">
-        <div class="modal-content">
-          <span class="close" onclick="fecharModal()">&times;</span>
+        <div class="modal-content">          
           <h2>Novo Projeto</h2>
-          <input type="text" id="nome-projeto" placeholder="Digite o nome do projeto" />
+          <input type="text" id="nome-projeto" placeholder="Digite o nome do projeto" />          
           <button onclick="salvarProjeto()">Salvar</button>
+          <button onclick="fecharModal()">Cancelar</button>
         </div>
       </div>      
       <aside class="sidebar">
@@ -101,7 +101,7 @@
           </ul>
         <div class="sidebar-footer">
           {% if user.is_authenticated %}
-          <p>Olá, {{ user.username | title }} !</p>
+            <p>Olá, {{ user.username | title }} !</p>
             <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>    
           {% else %}
             <a href="{% url 'login' %}" class="log-in">Log in</a>
@@ -127,6 +127,7 @@
           Com o PDG, você será guiado por um processo baseado no PMBOK com perguntas que auxiliam a documentar o projeto de forma rápida e prática com a ajuda de uma IA.        
         </p>
           <div class="botoes">
+            <span class="close" onclick="fecharModal()">&times;</span>
             <button class="btn-novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
           </div>     
       </main>
