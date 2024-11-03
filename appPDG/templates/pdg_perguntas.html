@@ -1,1 +1,141 @@
-{% extends 'projeto.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Perguntas - {{ pergunta.texto }}</title>
+    <link rel="stylesheet" href="{% static 'css/style_pdg_perguntas.css' %}">
+</head>
+<script>
+  function abrirModal() {
+    document.getElementById("modal-novo-projeto").style.display = "flex";
+  }
+  function fecharModal() {
+    document.getElementById("modal-novo-projeto").style.display = "none";
+  }
+  function salvarProjeto() {
+    const nomeProjeto = document.getElementById("nome-projeto").value;
+    
+    if (nomeProjeto.trim() === "") {
+        alert("Por favor, insira um nome para o projeto.");
+        return;
+    }
+
+    fetch("{% url 'salvar_projeto' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `nome_projeto=${nomeProjeto}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Erro ao salvar o projeto.");
+        } else {
+            // Atualiza a lista de projetos na sidebar
+            const listaProjetos = document.querySelector(".projetos-lista");
+            const novoProjeto = document.createElement("li");
+            novoProjeto.innerHTML = `<a href="/projeto/${data.projeto_id}/">${data.nome_projeto}</a>`;
+            listaProjetos.appendChild(novoProjeto);
+            
+            // Fecha o modal
+            fecharModal();
+            document.getElementById("nome-projeto").value = ""; // Limpa o campo
+            location.reload(); // Recarrega a página para exibir o novo projeto na lista
+        }
+    })
+    .catch(error => console.error("Erro:", error));
+  }
+  function carregarPerguntas(projetoId) {
+        fetch(`/projeto/${projetoId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erro ao carregar perguntas");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Atualizar o título da sidebar complementar
+                document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
+
+                // Limpar perguntas antigas
+                const listaPerguntas = document.querySelector(".sidebar-complementar ul");
+                listaPerguntas.innerHTML = "";
+
+                // Adicionar perguntas do projeto selecionado
+                data.perguntas.forEach(pergunta => {
+                    const li = document.createElement("li");
+                    const link = document.createElement("a");
+                    link.textContent = pergunta.texto;
+                    link.href = `/PDG_Pergunta/${projetoId}/${pergunta.id}/`; // Link para a página de interação de cada pergunta
+                    li.appendChild(link);
+                    listaPerguntas.appendChild(li);
+                });
+
+                // Mostrar a sidebar complementar se estiver oculta
+                document.querySelector(".sidebar-complementar").style.display = "block";
+            })
+            .catch(error => console.error("Erro ao carregar perguntas:", error));
+    }
+</script>
+<body>
+    <div class="container">
+        <!-- Sidebar Principal -->
+        <aside class="sidebar">
+            <button class="novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
+            <ul class="projetos-lista">
+                {% for projeto in projetos %}
+                    <li><a href="javascript:void(0);" onclick="carregarPerguntas({{ projeto.id }})">{{ projeto.nome }}</a></li>
+                {% endfor %}
+            </ul>
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <p>Olá, {{ user.username | title }} !</p>
+                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Log out</button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="log-in">Log in</a>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Section with Textarea and Save Button -->
+            <div class="top-section">
+                <h1>{{ pergunta.texto }}</h1>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <textarea name="resposta_texto" rows="5" placeholder="O que deseja salvar?">{{ resposta.resposta_texto }}</textarea>
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                </form>
+            </div>
+
+            <!-- Bottom Section with Interaction Area -->
+            <div class="bottom-section">
+                <div class="interacao">
+                    <input type="text" placeholder="Digite sua mensagem..." />
+                    <button class="btn-enviar">Send</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar Complementar -->
+        <aside class="sidebar-complementar" style="display: none;">
+            <h2>Projeto Selecionado</h2>
+            <ul></ul>
+        </aside>
+        <!-- Modal para Criar Novo Projeto -->
+        <div id="modal-novo-projeto" class="modal" style="display: none;">
+          <div class="modal-content">
+              <span onclick="fecharModal()" class="close">&times;</span>
+              <h2>Criar Novo Projeto</h2>
+              <input type="text" id="nome-projeto" placeholder="Nome do Projeto">
+              <button onclick="salvarProjeto()">Salvar Projeto</button>
+          </div>
+      </div>
+    </div>
+</body>
+</html>
