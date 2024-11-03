@@ -26,35 +26,6 @@ def pdgPerguntas_view(request, projeto_id, pergunta_id):
         'max_pergunta_id': max_pergunta_id,
     })
 
-# @method_decorator(login_required(login_url='login'), name='dispatch')
-# def pdg_view(request):
-#     return render(request, 'pdg.html')
-
-# def salvar_projeto(request):
-#     if request.method == 'POST':
-#         projeto = Projeto()
-#         projeto.nome = request.POST.get('nome')
-#         projeto.descricao = request.POST.get('descricao')
-#         projeto.save()
-#         return redirect('PDG')
-    
-# def salvar_projeto(request):
-#     if request.method == 'POST':
-#         nome_projeto = request.POST.get('nome_projeto')
-#         if nome_projeto:
-#             # Cria o projeto
-#             projeto = Projeto.objects.create(nome=nome_projeto, usuario=request.user)
-            
-#             # Associa todas as perguntas ao projeto criando respostas em branco
-#             perguntas = Pergunta.objects.all()
-#             for pergunta in perguntas:
-#                 Resposta.objects.get_or_create(projeto=projeto, pergunta=pergunta, resposta_texto="")
-            
-#             # Retorna uma resposta para atualizar a lista de projetos no frontend
-#             return JsonResponse({'projeto_id': projeto.id, 'nome_projeto': projeto.nome})
-
-#         return JsonResponse({'error': 'Nome do projeto é obrigatório'}, status=400)
-
 def salvar_projeto(request):
     if request.method == 'POST':
         nome_projeto = request.POST.get('nome_projeto')
@@ -103,53 +74,7 @@ def perguntas_do_projeto(request, projeto_id):
         'perguntas': list(perguntas)
     })
 
-def interagir_com_pergunta(request, pergunta_id):
-    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
-    return render(request, 'interacao_pergunta.html', {'pergunta': pergunta})
 
-@login_required
-def pagina_pergunta(request, pergunta_id):
-    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
-    resposta, created = Resposta.objects.get_or_create(
-        pergunta=pergunta,
-        projeto=pergunta.projeto_set.filter(usuario=request.user).first()  # Associa ao projeto correto
-    )
-
-    if request.method == 'POST':
-        resposta_texto = request.POST.get('resposta_texto')
-        resposta.resposta_texto = resposta_texto
-        resposta.save()
-    
-    projetos = Projeto.objects.filter(usuario=request.user)  # Para carregar na sidebar
-
-    return render(request, 'pdg_perguntas.html', {
-        'pergunta': pergunta,
-        'resposta': resposta,
-        'projetos': projetos,
-    })
-
-def criar_projeto(request):
-    if request.method == 'POST':
-        nome_do_projeto = request.POST.get('nome_projeto')
-        projeto = Projeto.objects.create(nome=nome_do_projeto, usuario=request.user)
-
-        # Carregar as perguntas padrão para o projeto
-        perguntas_texto = [
-            "Nome do Projeto", "Justificativa?", "Objetivo?", "Riscos, Restrições e Limitações prévias ou não do projeto?",
-            "Quais são os requisitos?", "Definição Geral do Escopo?", "Quais são os entregáveis?", 
-            "Critérios de aceitação dos entregáveis", "O que está fora do Escopo?", "Cronograma do Projeto", 
-            "Orçamento preliminar do projeto", "Formação da Equipe", "Métodos de Comunicação?", 
-            "Priorização dos métodos de comunicação", "Aquisições", "Benefícios do Projeto", 
-            "Critérios de Sucesso do Projeto", "Estratégias do Controle de Qualidade", 
-            "Em caso de Problema, o que fazer? Construção da Matriz"
-        ]
-        
-        for texto in perguntas_texto:
-            Pergunta.objects.create(projeto=projeto, texto=texto)
-
-        return JsonResponse({"projeto_id": projeto.id, "nome_projeto": projeto.nome})
-
-    
 def detalhes_do_projeto(request, projeto_id):
     projeto = get_object_or_404(Projeto, id=projeto_id, usuario=request.user)
     perguntas = projeto.perguntas.all()  # Todas as perguntas associadas ao projeto
@@ -160,3 +85,23 @@ def detalhes_do_projeto(request, projeto_id):
     ]
     
     return JsonResponse({"projeto_nome": projeto.nome, "perguntas": dados_perguntas})
+
+def salvar_resposta(request):
+    if request.method == 'POST':
+        resposta_texto = request.POST.get('resposta_texto')
+        pergunta_id = request.POST.get('pergunta_id')
+        projeto_id = request.POST.get('projeto_id')
+        
+        pergunta = Pergunta.objects.get(id=pergunta_id)
+        projeto = Projeto.objects.get(id=projeto_id)
+        
+        # Salvar a resposta no banco de dados, vinculando tanto ao projeto quanto à pergunta
+        resposta, created = Resposta.objects.update_or_create(
+            projeto=projeto,
+            pergunta=pergunta,
+            defaults={'resposta_texto': resposta_texto}
+        )
+        
+        return JsonResponse({'status': 'success', 'message': 'Resposta salva com sucesso!'})
+
+    return JsonResponse({'status': 'error', 'message': 'Método não permitido.'}, status=405)

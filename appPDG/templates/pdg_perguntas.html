@@ -91,6 +91,29 @@
             })
             .catch(error => console.error("Erro ao carregar perguntas:", error));
     }
+  function salvarResposta() {
+      const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
+      const perguntaId = {{ pergunta.id }};
+      const projetoId = {{ projeto.id }};
+      
+      fetch("{% url 'salvar_resposta' %}", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === 'success') {
+              alert(data.message);
+          } else {
+              alert("Erro ao salvar a resposta.");
+          }
+      })
+      .catch(error => console.error("Erro:", error));
+    }
 </script>
 <body>
     <div class="container">
@@ -123,7 +146,7 @@
                     {% csrf_token %}
                     <textarea name="resposta_texto" rows="5" placeholder="O que deseja salvar?">{{ resposta.resposta_texto }}</textarea>
                     <button type="button" onclick="irParaPerguntaAnterior({{ projeto.id }}, {{ pergunta.id }})" class="btn-previous">Pergunta Anterior</button>
-                    <button type="submit" class="btn-salvar">Salvar</button>
+                    <button type="submit" onclick="salvarResposta()" class="btn-salvar">Salvar</button>
                     <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
                 </form>
             </div>

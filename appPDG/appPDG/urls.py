@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import page_test, salvar_projeto, basePDG, projectListView, perguntas_do_projeto, interagir_com_pergunta, pagina_pergunta, detalhes_do_projeto, pdgPerguntas_view
+from app.views import page_test, salvar_projeto, basePDG, projectListView, detalhes_do_projeto, pdgPerguntas_view, salvar_resposta
 from accounts.views import register_view, logout_view, login_view
 from django.conf import settings
 from django.conf.urls.static import static
@@ -32,16 +32,12 @@ urlpatterns = [
     path('1/', page_test, name='page_test'),
     path('PDG/', projectListView.as_view() , name='PDG'),
     path('basePDG/', basePDG, name='basePDG'),
-    #path('projeto/<int:projeto_id>/', perguntas_do_projeto, name='perguntas_do_projeto'),
-    #path('pergunta/<int:pergunta_id>/', perguntas_do_projeto, name='pagina_pergunta'),
-    #
+    # Ação de Salvar a Resposta que o usuário deu a uma pergunta - TextArea
+    path('salvar_resposta/', salvar_resposta, name='salvar_resposta'),
     # Lista as perguntas do projeto no frontend - Sidebar complementar do projeto
-    #path('pergunta/<int:pergunta_id>/', page_test, name='pagina_pergunta'),  # Link para página de cada pergunta
     path('projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
-
     path('PDG_Pergunta/<int:projeto_id>/<int:pergunta_id>/', pdgPerguntas_view, name='pagina_pergunta'),
     path('detalhes_do_projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
-    
     # Paginas de ação
     path('logout/', logout_view, name='logout'),
     path('salvar_projeto/', salvar_projeto, name='salvar_projeto'),    
