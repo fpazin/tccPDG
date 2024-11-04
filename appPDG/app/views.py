@@ -5,9 +5,10 @@ from django.utils.decorators import method_decorator
 from .models import Projeto, Pergunta, Resposta
 from django.views import View
 from django.views.generic import ListView
+from appPDG.main import geracao_texto
 
 # Create your views here.
-
+# Região de Testes
 def page_test(request):
     print(request.user.username)
     return render(request, 'pdg_test.html')
@@ -15,6 +16,7 @@ def page_test(request):
 def basePDG(request):
     return render(request, 'pdg_base.html')
 
+# Região do PDG - Produção
 def pdgPerguntas_view(request, projeto_id, pergunta_id):
     projetos = Projeto.objects.filter(usuario=request.user)  # Ou o filtro adequado para os projetos
     pergunta = get_object_or_404(Pergunta, id=pergunta_id)
@@ -105,3 +107,16 @@ def salvar_resposta(request):
         return JsonResponse({'status': 'success', 'message': 'Resposta salva com sucesso!'})
 
     return JsonResponse({'status': 'error', 'message': 'Método não permitido.'}, status=405)
+
+# Região de OpenAI
+def enviar_mensagem(request):
+    if request.method == 'POST':
+        mensagem_usuario = request.POST.get('mensagem')
+        mensagens = [{'role': 'user', 'content': mensagem_usuario}]
+        
+        # Obtém a resposta da função geracao_texto
+        resposta = geracao_texto(mensagens)
+        
+        return JsonResponse({'resposta': resposta})
+    
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)

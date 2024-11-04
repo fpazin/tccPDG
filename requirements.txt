@@ -5,4 +5,5 @@
 # Lista de dependências do projeto
 
 Django
-openai>=1.14.0
+openai
+python-dotenv

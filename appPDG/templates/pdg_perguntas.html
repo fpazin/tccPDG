@@ -8,6 +8,40 @@
     <link rel="stylesheet" href="{% static 'css/style_pdg_perguntas.css' %}">
 </head>
 <script>
+  function enviarMensagem() {
+      const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
+      const mensagemTexto = mensagemInput.value;
+      
+      fetch("{% url 'enviar_mensagem' %}", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: `mensagem=${encodeURIComponent(mensagemTexto)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.resposta) {
+              // Cria o elemento para a resposta do assistente
+              const respostaDiv = document.createElement("div");
+              respostaDiv.textContent = `Assistant: ${data.resposta}`;
+              
+              // Adiciona a resposta ao final do contêiner de mensagens
+              const mensagensContainer = document.querySelector(".mensagens-container");
+              mensagensContainer.appendChild(respostaDiv);
+
+              // Limpa o campo de entrada
+              mensagemInput.value = '';
+              
+              // Rola automaticamente para a última mensagem adicionada
+              mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
+          } else {
+              alert("Erro ao enviar mensagem.");
+          }
+      })
+      .catch(error => console.error("Erro:", error));
+  }
   function abrirModal() {
     document.getElementById("modal-novo-projeto").style.display = "flex";
   }
@@ -61,60 +95,59 @@
       }
   }
   function carregarPerguntas(projetoId) {
-        fetch(`/projeto/${projetoId}/`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Erro ao carregar perguntas");
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Atualizar o título da sidebar complementar
-                document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
+    fetch(`/projeto/${projetoId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro ao carregar perguntas");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Atualizar o título da sidebar complementar
+            document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
 
-                // Limpar perguntas antigas
-                const listaPerguntas = document.querySelector(".sidebar-complementar ul");
-                listaPerguntas.innerHTML = "";
+            // Limpar perguntas antigas
+            const listaPerguntas = document.querySelector(".sidebar-complementar ul");
+            listaPerguntas.innerHTML = "";
 
-                // Adicionar perguntas do projeto selecionado
-                data.perguntas.forEach(pergunta => {
-                    const li = document.createElement("li");
-                    const link = document.createElement("a");
-                    link.textContent = pergunta.texto;
-                    link.href = `/PDG_Pergunta/${projetoId}/${pergunta.id}/`; // Link para a página de interação de cada pergunta
-                    li.appendChild(link);
-                    listaPerguntas.appendChild(li);
-                });
+            // Adicionar perguntas do projeto selecionado
+            data.perguntas.forEach(pergunta => {
+                const li = document.createElement("li");
+                const link = document.createElement("a");
+                link.textContent = pergunta.texto;
+                link.href = `/PDG_Pergunta/${projetoId}/${pergunta.id}/`; // Link para a página de interação de cada pergunta
+                li.appendChild(link);
+                listaPerguntas.appendChild(li);
+            });
 
-                // Mostrar a sidebar complementar se estiver oculta
-                document.querySelector(".sidebar-complementar").style.display = "block";
-            })
-            .catch(error => console.error("Erro ao carregar perguntas:", error));
+            // Mostrar a sidebar complementar se estiver oculta
+            document.querySelector(".sidebar-complementar").style.display = "block";
+        })
+        .catch(error => console.error("Erro ao carregar perguntas:", error));
     }
-  function salvarResposta() {
-      const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
-      const perguntaId = {{ pergunta.id }};
-      const projetoId = {{ projeto.id }};
-      
-      fetch("{% url 'salvar_resposta' %}", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "X-CSRFToken": "{{ csrf_token }}"
-          },
-          body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.status === 'success') {
-              alert(data.message);
-          } else {
-              alert("Erro ao salvar a resposta.");
-          }
-      })
-      .catch(error => console.error("Erro:", error));
-    }
-</script>
+  function salvarResposta(){
+    const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
+    const perguntaId = {{ pergunta.id }};
+    const projetoId = {{ projeto.id }};      
+    fetch("{% url 'salvar_resposta' %}", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+        } else {
+            alert("Erro ao salvar a resposta.");
+        }
+    })
+    .catch(error => console.error("Erro:", error));
+  }
+  </script>
 <body>
     <div class="container">
         <!-- Sidebar Principal -->
@@ -154,8 +187,10 @@
             <!-- Bottom Section with Interaction Area -->
             <div class="bottom-section">
                 <div class="interacao">
-                    <input type="text" placeholder="Digite sua mensagem..." />
-                    <button class="btn-enviar">Enviar</button>
+                  <!-- Contêiner para mensagens anteriores e novas respostas -->
+                  <div class="mensagens-container"></div>
+                  <input type="text" placeholder="Digite sua mensagem..." />
+                  <button class="btn-enviar" onclick="enviarMensagem()">Enviar</button>
                 </div>
             </div>
         </main>

@@ -251,3 +251,8 @@ footer {
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
+.mensagens-container {
+  max-height: 300px; /* Ajuste a altura conforme necessário */
+  overflow-y: auto;
+  margin-bottom: 10px; /* Espaço entre o contêiner e o campo de entrada */
+}
