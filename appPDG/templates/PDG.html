@@ -4,137 +4,114 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
+    <title>Dashboard - PDG</title>
+    <link rel="stylesheet" href="{% static 'css/style_pdg.css' %}" />
   </head>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+  <script>
+    function abrirModal() {
+      document.getElementById("modal-novo-projeto").style.display = "flex";
     }
+    function fecharModal() {
+      document.getElementById("modal-novo-projeto").style.display = "none";
+    }
+    function salvarProjeto() {
+      const nomeProjeto = document.getElementById("nome-projeto").value;
+      
+      if (nomeProjeto.trim() === "") {
+          alert("Por favor, insira um nome para o projeto.");
+          return;
+      }
 
-    body {
-      display: flex;
-      height: 100vh;
-      background-color: #1f1f1f;
-      color: white;
+      fetch("{% url 'salvar_projeto' %}", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: `nome_projeto=${nomeProjeto}`
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.error) {
+              alert("Erro ao salvar o projeto.");
+          } else {
+              // Atualiza a lista de projetos na sidebar
+              const listaProjetos = document.querySelector(".projetos-lista");
+              const novoProjeto = document.createElement("li");
+              novoProjeto.innerHTML = `<a href="/projeto/${data.projeto_id}/">${data.nome_projeto}</a>`;
+              listaProjetos.appendChild(novoProjeto);
+              
+              // Fecha o modal
+              fecharModal();
+              document.getElementById("nome-projeto").value = ""; // Limpa o campo
+              location.reload(); // Recarrega a página para exibir o novo projeto na lista
+          }
+      })
+      .catch(error => console.error("Erro:", error));
     }
+    function carregarPerguntas(projetoId) {
+      fetch(`/projeto/${projetoId}/`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error("Erro ao carregar perguntas");
+              }
+              return response.json();
+          })
+          .then(data => {
+              // Atualizar o título da sidebar complementar
+              document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
 
-    .container {
-      display: flex;
-      width: 100%;
-    }
+              // Limpar perguntas antigas
+              const listaPerguntas = document.querySelector(".sidebar-complementar ul");
+              listaPerguntas.innerHTML = "";
 
-    .sidebar {
-      width: 250px;
-      background-color: #2c2c2c;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-    }
+              // Adicionar perguntas do projeto selecionado
+              data.perguntas.forEach(pergunta => {
+                  const li = document.createElement("li");
+                  const link = document.createElement("a");
+                  link.textContent = pergunta.texto;
+                  //link.href = `/pergunta/${pergunta.id}/`;
+                  link.href = `/PDG_Pergunta/${projetoId}/${pergunta.id}/` // Link para página de interação de cada pergunta
+                  li.appendChild(link);
+                  listaPerguntas.appendChild(li);
+              });
 
-    .novo-projeto {
-      background-color: #6d64fd;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-bottom: 20px;
-    }
-
-    .projetos-lista {
-      list-style: none;
-    }
-
-    .projetos-lista li {
-      margin: 10px 0;
-    }
-
-    .sidebar-footer button {
-      display: block;
-      margin-bottom: 10px;
-      background-color: transparent;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      padding: 10px;
-    }
-
-    .main-content {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-
-    .logo {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .descricao {
-      max-width: 600px;
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-
-    .botoes {
-      display: flex;
-      gap: 20px;
-    }
-
-    .btn-novo-projeto,
-    .btn-meus-projetos {
-      background-color: #6d64fd;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .btn-novo-projeto:hover,
-    .btn-meus-projetos:hover {
-      background-color: #574fd1;
-    }
-    a.log-in {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #6d64fd;  /* Cor de fundo do botão */
-    color: white;               /* Cor do texto */
-    text-decoration: none;      /* Remove o sublinhado */
-    border-radius: 10px;        /* Bordas arredondadas */
-    font-weight: bold;
-    text-align: center;
-    transition: background-color 0.3s ease; /* Transição para o hover */
-    }
-
-    a.log-in:hover {
-        background-color: #574fd1; /* Cor ao passar o mouse */
-    }
-  </style>
+              // Mostrar a sidebar complementar se estiver oculta
+              document.querySelector(".sidebar-complementar").style.display = "block";
+          })
+          .catch(error => console.error("Erro ao carregar perguntas:", error));
+      }
+  </script>
   <body>
-    <div class="container">      
+    <div class="container">
+      <div id="modal-novo-projeto" class="modal">
+        <div class="modal-content">          
+          <h2>Novo Projeto</h2>
+          <input type="text" id="nome-projeto" placeholder="Digite o nome do projeto" />          
+          <button onclick="salvarProjeto()">Salvar</button>
+          <button onclick="fecharModal()">Cancelar</button>
+        </div>
+      </div>      
       <aside class="sidebar">
-          <button class="novo-projeto">+ Novo Projeto</button>
-        <ul class="projetos-lista"></ul>
+          <button class="btn-novo-projeto" onclick="abrirModal()">+ Novo Projeto!</button>
+          <ul class="projetos-lista">
+            {% for projeto in projetos %}
+                <li><a href="javascript:void(0);" onclick="carregarPerguntas( {{ projeto.id }} )">{{ projeto.nome }}</a></li>
+            {% endfor %}
+          </ul>
         <div class="sidebar-footer">
           {% if user.is_authenticated %}
-          <p>Olá, {{ user.username | title }} !</p>
+            <p>Olá, {{ user.username | title }} !</p>
             <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>    
           {% else %}
             <a href="{% url 'login' %}" class="log-in">Log in</a>
           {% endif %}                
+        </div> <!-- sidebar complementar -->
+        <div class="sidebar-complementar" style="display: none;">
+          <h2>Projeto Selecionado</h2>
+          <ul></ul>
         </div>
       </aside>
-
       <main class="main-content">
         <div>
           <a href="{% url 'login' %}">
@@ -150,9 +127,13 @@
           Com o PDG, você será guiado por um processo baseado no PMBOK com perguntas que auxiliam a documentar o projeto de forma rápida e prática com a ajuda de uma IA.        
         </p>
           <div class="botoes">
-            <button class="btn-novo-projeto">+ Novo Projeto</button>
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <button class="btn-novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
           </div>     
       </main>
     </div>
+    <footer>
+      <p>&copy; 2024 PDG. Todos os direitos reservados.</p>
+    </footer>
   </body>
 </html>

@@ -16,17 +16,31 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from app.views import PDG_view
-from app.views import page_test, pdg_view
-from accounts.views import register_view, login, logout_view, login_view
+from app.views import page_test, salvar_projeto, basePDG, projectListView, detalhes_do_projeto, pdgPerguntas_view, salvar_resposta, enviar_mensagem
+from accounts.views import register_view, logout_view, login_view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # Paginas Administrativas
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
+    # Paginas do PDG
     path('register/', register_view, name='register'),
-    path('PDG/', pdg_view, name='PDG'),
+    #path('PDG/', PDGView.as_view(), name='PDG'), # PDGView.as_view() foi substituido por projectListView.as_view()
+    #paginas de teste
     path('1/', page_test, name='page_test'),
+    path('PDG/', projectListView.as_view() , name='PDG'),
+    path('basePDG/', basePDG, name='basePDG'),
+    # Ação de Salvar a Resposta que o usuário deu a uma pergunta - TextArea
+    path('salvar_resposta/', salvar_resposta, name='salvar_resposta'),
+    # Ação enviar mensagem para OpenAI
+    path('enviar_mensagem/', enviar_mensagem, name='enviar_mensagem'),
+    # Lista as perguntas do projeto no frontend - Sidebar complementar do projeto
+    path('projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
+    path('PDG_Pergunta/<int:projeto_id>/<int:pergunta_id>/', pdgPerguntas_view, name='pagina_pergunta'),
+    path('detalhes_do_projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
+    # Paginas de ação
+    path('logout/', logout_view, name='logout'),
+    path('salvar_projeto/', salvar_projeto, name='salvar_projeto'),    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

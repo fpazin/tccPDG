@@ -1,0 +1,125 @@
+{% load static %} <!-- Load the static template tag -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Base PDG</title>
+    <link rel="stylesheet" href="{% static 'css/css.css' %}" />
+  </head>
+  <script>
+  function abrirModal() {
+    document.getElementById("modal-novo-projeto").style.display = "flex";
+  }
+
+  function fecharModal() {
+    document.getElementById("modal-novo-projeto").style.display = "none";
+  }
+  function salvarProjeto() {
+    const nomeProjeto = document.getElementById("nome-projeto").value;
+    
+    if (nomeProjeto.trim() === "") {
+        alert("Por favor, insira um nome para o projeto.");
+        return;
+    }
+
+    fetch("{% url 'salvar_projeto' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `nome_projeto=${nomeProjeto}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Erro ao salvar o projeto.");
+        } else {
+            // Atualiza a lista de projetos na sidebar
+            const listaProjetos = document.querySelector(".projetos-lista");
+            const novoProjeto = document.createElement("li");
+            novoProjeto.innerHTML = `<a href="/projeto/${data.projeto_id}/">${data.nome_projeto}</a>`;
+            listaProjetos.appendChild(novoProjeto);
+            
+            // Fecha o modal
+            fecharModal();
+            document.getElementById("nome-projeto").value = ""; // Limpa o campo
+        }
+    })
+    .catch(error => console.error("Erro:", error));
+  }
+  function carregarPerguntas(projetoId) {
+    fetch(`/projeto/${projetoId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar o título da sidebar complementar
+            document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
+
+            // Limpar perguntas antigas
+            const listaPerguntas = document.querySelector(".sidebar-complementar ul");
+            listaPerguntas.innerHTML = "";
+
+            // Adicionar perguntas do projeto selecionado
+            data.perguntas.forEach(pergunta => {
+                const li = document.createElement("li");
+                li.textContent = pergunta.texto;
+                listaPerguntas.appendChild(li);
+            });
+
+            // Mostrar a sidebar complementar se estiver oculta
+            document.querySelector(".sidebar-complementar").style.display = "block";
+        })
+        .catch(error => console.error("Erro ao carregar perguntas:", error));
+  }
+  </script>
+  <body>
+    <div class="container">
+      <div id="modal-novo-projeto" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="fecharModal()">&times;</span>
+          <h2>Novo Projeto</h2>
+          <input type="text" id="nome-projeto" placeholder="Digite o nome do projeto" />
+          <button onclick="salvarProjeto()">Salvar</button>
+        </div>
+      </div>      
+      <aside class="sidebar">
+          <button class="novo-projeto">+ Novo Projeto</button>
+          <ul class="projetos-lista">
+            {% for projeto in projetos %}
+                <li><a href="javascript:void(0);" onclick="carregarPerguntas( {{ projeto.id }} )">{{ projeto.nome }}</a></li>
+            {% endfor %}
+          </ul>
+        <div class="sidebar-footer">
+          {% if user.is_authenticated %}
+          <p>Olá, {{ user.username | title }} !</p>
+            <button onclick="window.location.href={% url 'logout' %}" class="log-out">Log out</button>    
+          {% else %}
+            <a href="{% url 'login' %}" class="log-in">Log in</a>
+          {% endif %}                
+        </div> <!-- sidebar complementar -->
+        <div class="sidebar-complementar" style="display: none;">
+          <h2>Projeto Selecionado</h2>
+          <ul></ul>
+        </div>
+      </aside>
+      <main class="main-content">
+        <div>
+          <a href="{% url 'login' %}">
+            <img
+              src="{% static 'images/imagemPDG4.png' %}"
+              alt="Logo"
+              class="logo"
+            />
+          </a>
+        </div>
+          <div class="botoes">
+            <button class="btn-novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
+          </div>     
+      </main>
+    </div>
+    <footer>
+      <p>&copy; 2024 PDG. Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

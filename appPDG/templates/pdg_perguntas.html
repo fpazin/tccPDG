@@ -1,0 +1,213 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Perguntas - {{ pergunta.texto }}</title>
+    <link rel="stylesheet" href="{% static 'css/style_pdg_perguntas.css' %}">
+</head>
+<script>
+  function enviarMensagem() {
+      const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
+      const mensagemTexto = mensagemInput.value;
+      
+      fetch("{% url 'enviar_mensagem' %}", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: `mensagem=${encodeURIComponent(mensagemTexto)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.resposta) {
+              // Cria o elemento para a resposta do assistente
+              const respostaDiv = document.createElement("div");
+              respostaDiv.textContent = `IA: ${data.resposta}`;
+              
+              // Adiciona a resposta ao final do contêiner de mensagens
+              const mensagensContainer = document.querySelector(".mensagens-container");
+              mensagensContainer.appendChild(respostaDiv);
+
+              // Limpa o campo de entrada
+              mensagemInput.value = '';
+              
+              // Rola automaticamente para a última mensagem adicionada
+              mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
+          } else {
+              alert("Erro ao enviar mensagem.");
+          }
+      })
+      .catch(error => console.error("Erro:", error));
+  }
+  function abrirModal() {
+    document.getElementById("modal-novo-projeto").style.display = "flex";
+  }
+  function fecharModal() {
+    document.getElementById("modal-novo-projeto").style.display = "none";
+  }
+  function salvarProjeto() {
+    const nomeProjeto = document.getElementById("nome-projeto").value;
+    
+    if (nomeProjeto.trim() === "") {
+        alert("Por favor, insira um nome para o projeto.");
+        return;
+    }
+
+    fetch("{% url 'salvar_projeto' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `nome_projeto=${nomeProjeto}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Erro ao salvar o projeto.");
+        } else {
+            // Atualiza a lista de projetos na sidebar
+            const listaProjetos = document.querySelector(".projetos-lista");
+            const novoProjeto = document.createElement("li");
+            novoProjeto.innerHTML = `<a href="/projeto/${data.projeto_id}/">${data.nome_projeto}</a>`;
+            listaProjetos.appendChild(novoProjeto);
+            
+            // Fecha o modal
+            fecharModal();
+            document.getElementById("nome-projeto").value = ""; // Limpa o campo
+            location.reload(); // Recarrega a página para exibir o novo projeto na lista
+        }
+    })
+    .catch(error => console.error("Erro:", error));
+  }
+      // Funções para navegação entre perguntas
+  function irParaPerguntaAnterior(projetoId, perguntaId) {
+      if (perguntaId => 1) {
+          window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId - 1}/`;
+      }
+  }
+  function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
+      if (perguntaId < maxPerguntaId) {
+          window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId + 1}/`;
+      }
+  }
+  function carregarPerguntas(projetoId) {
+    fetch(`/projeto/${projetoId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro ao carregar perguntas");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Atualizar o título da sidebar complementar
+            document.querySelector(".sidebar-complementar h2").textContent = data.projeto_nome;
+
+            // Limpar perguntas antigas
+            const listaPerguntas = document.querySelector(".sidebar-complementar ul");
+            listaPerguntas.innerHTML = "";
+
+            // Adicionar perguntas do projeto selecionado
+            data.perguntas.forEach(pergunta => {
+                const li = document.createElement("li");
+                const link = document.createElement("a");
+                link.textContent = pergunta.texto;
+                link.href = `/PDG_Pergunta/${projetoId}/${pergunta.id}/`; // Link para a página de interação de cada pergunta
+                li.appendChild(link);
+                listaPerguntas.appendChild(li);
+            });
+
+            // Mostrar a sidebar complementar se estiver oculta
+            document.querySelector(".sidebar-complementar").style.display = "block";
+        })
+        .catch(error => console.error("Erro ao carregar perguntas:", error));
+    }
+  function salvarResposta(){
+    const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
+    const perguntaId = {{ pergunta.id }};
+    const projetoId = {{ projeto.id }};      
+    fetch("{% url 'salvar_resposta' %}", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+        } else {
+            alert("Erro ao salvar a resposta.");
+        }
+    })
+    .catch(error => console.error("Erro:", error));
+  }
+  </script>
+<body>
+    <div class="container">
+        <!-- Sidebar Principal -->
+        <aside class="sidebar">
+            <button class="novo-projeto" onclick="abrirModal()">+ Novo Projeto</button>
+            <ul class="projetos-lista">
+                {% for projeto in projetos %}
+                    <li><a href="javascript:void(0);" onclick="carregarPerguntas({{ projeto.id }})">{{ projeto.nome }}</a></li>
+                {% endfor %}
+            </ul>
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <p>Olá, {{ user.username | title }} !</p>
+                    <button onclick="window.location.href={% url 'PDG' %}">Início</button>    
+                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Sair</button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="log-in">Log in</a>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Section with Textarea and Save Button -->
+            <div class="top-section">
+                <h2>Projeto: {{ projeto.nome }}</h2>
+                <h1>{{ pergunta.texto }}</h1>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <textarea name="resposta_texto" rows="5" placeholder="O que deseja salvar?">{{ resposta.resposta_texto }}</textarea>
+                    <button type="button" onclick="irParaPerguntaAnterior({{ projeto.id }}, {{ pergunta.id }})" class="btn-previous">Pergunta Anterior</button>
+                    <button type="submit" onclick="salvarResposta()" class="btn-salvar">Salvar</button>
+                    <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
+                </form>
+            </div>
+
+            <!-- Bottom Section with Interaction Area -->
+            <div class="bottom-section">
+                <div class="interacao">
+                  <!-- Contêiner para mensagens anteriores e novas respostas -->
+                  <div class="mensagens-container"></div>
+                  <input type="text" placeholder="Digite sua mensagem..." />
+                  <button class="btn-enviar" onclick="enviarMensagem()">Enviar</button>
+                </div>
+            </div>
+        </main>
+        <!-- Sidebar Complementar -->
+        <aside class="sidebar-complementar" style="display: none;">
+            <h2>Projeto Selecionado</h2>
+            <ul></ul>
+        </aside>
+        <!-- Modal para Criar Novo Projeto -->
+        <div id="modal-novo-projeto" class="modal" style="display: none;">
+          <div class="modal-content">
+              <span onclick="fecharModal()" class="close">&times;</span>
+              <h2>Criar Novo Projeto</h2>
+              <input type="text" id="nome-projeto" placeholder="Nome do Projeto">
+              <button onclick="salvarProjeto()">Salvar Projeto</button>
+          </div>
+      </div>
+    </div>
+</body>
+</html>

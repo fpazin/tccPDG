@@ -1,9 +1,15 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
 <style>
   body {
-    background-color: #e6e9fc; /* mesma cor de fundo da página de login */
+    background-color: #e6e9fc; /* mesma cor de fundo da página de login */    
   }
 </style>
+<head>
+  <title>Página de Cadastro - PDG</title>
+</head>
+
 <div class="left-section">
   <img
     class="logo"
@@ -12,7 +18,14 @@
     style="width: 120px; height: 80px; border-radius: 0"
   />
 </div>
+
 <div class="right-section">
+  
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+  {% endif %}
   
   <form method="post" class="form-group">
     {% csrf_token %}
@@ -45,4 +58,13 @@
     </button>
   </form>
 </div>
+
+{% if redirect %}
+<script>
+    setTimeout(function() {
+        window.location.href = "{% url 'login' %}";
+    }, 3000);  // Redireciona após 3 segundos (3000 milissegundos)
+</script>
+{% endif %}
+
 {% endblock %}
