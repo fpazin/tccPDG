@@ -121,10 +121,19 @@
             });
 
             // Mostrar a sidebar complementar se estiver oculta
-            document.querySelector(".sidebar-complementar").style.display = "block";
+            //document.querySelector(".sidebar-complementar").style.display = "block";
+            const sidebarComplementar = document.querySelector(".sidebar-complementar");
+            sidebarComplementar.style.display = "block";
         })
         .catch(error => console.error("Erro ao carregar perguntas:", error));
     }
+    // Função para inicializar a sidebar complementar ao carregar a página
+  function initSidebarComplementar() {
+        const projetoId = {{ projeto.id }}; // Obtém o ID do projeto atual
+        carregarPerguntas(projetoId); // Carrega as perguntas para o projeto atual
+    }
+    // Chama a função de inicialização quando a página é carregada
+    window.onload = initSidebarComplementar;
   function salvarResposta(){
     const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
     const perguntaId = {{ pergunta.id }};
