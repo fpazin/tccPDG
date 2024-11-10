@@ -190,6 +190,13 @@
                     <button type="submit" onclick="salvarResposta()" class="btn-salvar">Salvar</button>
                     <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
                 </form>
+                <!-- Área para exibir a resposta registrada, se houver -->
+                {% if resposta.resposta_texto %}
+                <div class="resposta-registrada">
+                    <h3>Resposta Registrada:</h3>
+                    <p>{{ resposta.resposta_texto }}</p>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Bottom Section with Interaction Area -->

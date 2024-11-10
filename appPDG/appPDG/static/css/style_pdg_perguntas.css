@@ -292,3 +292,24 @@ footer {
 .btn-imprimir:hover {
   background-color: #574fd1;
 }
+
+.resposta-registrada {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #333;
+}
+
+.resposta-registrada h3 {
+  margin-top: 0;
+  font-size: 1.1em;
+  color: #555;
+}
+
+.resposta-registrada p {
+  margin: 0;
+  font-size: 1em;
+  color: #333;
+}

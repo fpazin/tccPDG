@@ -24,10 +24,15 @@ def pdgPerguntas_view(request, projeto_id, pergunta_id):
     projetos = Projeto.objects.filter(usuario=request.user)  # Ou o filtro adequado para os projetos
     pergunta = get_object_or_404(Pergunta, id=pergunta_id)
     max_pergunta_id = Pergunta.objects.filter(projeto_id=projeto_id).order_by('-id').first().id
+
+     # Obter a resposta específica para a pergunta, se existir
+    resposta = Resposta.objects.filter(pergunta_id=pergunta_id, projeto_id=projeto_id).first()
+
     return render(request, 'pdg_perguntas.html', {
         'projeto': Projeto.objects.get(id=projeto_id),
         'pergunta': pergunta,
         'projetos': projetos,
+        'resposta': resposta,
         'max_pergunta_id': max_pergunta_id,
     })
 
