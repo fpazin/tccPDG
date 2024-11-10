@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import page_test, salvar_projeto, basePDG, projectListView, detalhes_do_projeto, pdgPerguntas_view, salvar_resposta, enviar_mensagem
+from app.views import salvar_projeto, basePDG, projectListView, detalhes_do_projeto, pdgPerguntas_view, salvar_resposta, enviar_mensagem, gerar_pdf
 from accounts.views import register_view, logout_view, login_view
 from django.conf import settings
 from django.conf.urls.static import static
@@ -29,7 +29,6 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     #path('PDG/', PDGView.as_view(), name='PDG'), # PDGView.as_view() foi substituido por projectListView.as_view()
     #paginas de teste
-    path('1/', page_test, name='page_test'),
     path('PDG/', projectListView.as_view() , name='PDG'),
     path('basePDG/', basePDG, name='basePDG'),
     # Ação de Salvar a Resposta que o usuário deu a uma pergunta - TextArea
@@ -40,6 +39,7 @@ urlpatterns = [
     path('projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
     path('PDG_Pergunta/<int:projeto_id>/<int:pergunta_id>/', pdgPerguntas_view, name='pagina_pergunta'),
     path('detalhes_do_projeto/<int:projeto_id>/', detalhes_do_projeto, name='detalhes_do_projeto'),
+    path('projeto/<int:projeto_id>/imprimir_pdf', gerar_pdf, name='imprimir_pdf'),
     # Paginas de ação
     path('logout/', logout_view, name='logout'),
     path('salvar_projeto/', salvar_projeto, name='salvar_projeto'),    

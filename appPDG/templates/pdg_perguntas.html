@@ -126,12 +126,12 @@
             sidebarComplementar.style.display = "block";
         })
         .catch(error => console.error("Erro ao carregar perguntas:", error));
-    }
+}
     // Função para inicializar a sidebar complementar ao carregar a página
   function initSidebarComplementar() {
         const projetoId = {{ projeto.id }}; // Obtém o ID do projeto atual
         carregarPerguntas(projetoId); // Carrega as perguntas para o projeto atual
-    }
+        }
     // Chama a função de inicialização quando a página é carregada
     window.onload = initSidebarComplementar;
   function salvarResposta(){
@@ -156,7 +156,7 @@
     })
     .catch(error => console.error("Erro:", error));
   }
-  </script>
+</script>
 <body>
     <div class="container">
         <!-- Sidebar Principal -->
@@ -177,7 +177,6 @@
                 {% endif %}
             </div>
         </aside>
-
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Section with Textarea and Save Button -->
@@ -205,8 +204,12 @@
         </main>
         <!-- Sidebar Complementar -->
         <aside class="sidebar-complementar" style="display: none;">
-            <h2>Projeto Selecionado</h2>
+            <div class="sidebar-header">
+                <h2>Projeto Selecionado</h2>
+                <button onclick="fecharSidebarComplementar()" class="btn-fechar">X</button>
+            </div>
             <ul></ul>
+            <a href="{% url 'imprimir_pdf' projeto.id %}" class="btn-imprimir" target="_blank">Imprimir PDF</a>
         </aside>
         <!-- Modal para Criar Novo Projeto -->
         <div id="modal-novo-projeto" class="modal" style="display: none;">

@@ -1,17 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.conf import settings
 from .models import Projeto, Pergunta, Resposta
 from django.views import View
 from django.views.generic import ListView
 from appPDG.main import geracao_texto
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors, utils
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+import io, os
 
 # Create your views here.
 # Região de Testes
-def page_test(request):
-    print(request.user.username)
-    return render(request, 'pdg_test.html')
 
 def basePDG(request):
     return render(request, 'pdg_base.html')
@@ -120,3 +123,69 @@ def enviar_mensagem(request):
         return JsonResponse({'resposta': resposta})
     
     return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
+# Região de Impressão do PDF do Projeto
+def gerar_pdf(request, projeto_id):
+    # Obtenha o projeto, perguntas e respostas
+    projeto = Projeto.objects.get(id=projeto_id)
+    perguntas = Pergunta.objects.filter(projeto_id=projeto_id)
+    respostas = {resposta.pergunta_id: resposta.resposta_texto for resposta in Resposta.objects.filter(projeto_id=projeto_id)}
+
+    # Crie um buffer de bytes para o PDF
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    largura, altura = A4
+
+    for i, pergunta in enumerate(perguntas, start=1):
+        # Cabeçalho do documento
+        c.setFont("Helvetica-Bold", 14)
+        c.drawString(2 * cm, altura - 2 * cm, "PDG – Project Documentation Generator")
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(2 * cm, altura - 2.7 * cm, f"Nome do Projeto: {projeto.nome}")
+
+        # Logo
+        logo_path = os.path.join(settings.BASE_DIR, 'appPDG', 'static', 'images', 'imagemPDG4.png')  # Substitua pelo caminho correto
+        c.drawImage(logo_path, largura - 5 * cm, altura - 3 * cm, width=3 * cm, height=2 * cm)
+        #c.drawString(largura - 4 * cm, altura - 2 * cm, "SUA LOGO")
+        
+        # Pergunta e Resposta
+        c.setFont("Helvetica-Bold", 14)
+        c.drawString(2 * cm, altura - 4 * cm, f"{i} Pergunta: “{pergunta.texto}”")
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(2 * cm, altura - 5 * cm, "Resposta:")
+        c.setFont("Helvetica", 10)
+        resposta_texto = respostas.get(pergunta.id, "<Nenhuma resposta foi registrada para esta pergunta...>")
+        #c.drawString(2 * cm, altura - 5.5 * cm, resposta_texto)
+        def draw_wrapped_text(c, text, x, y, max_width):
+            lines = utils.simpleSplit(text, "Helvetica", 10, max_width)
+            for line in lines:
+                c.drawString(x, y, line)
+                y -= 12  # Ajuste para a próxima linha
+
+        # Chamar a função de quebra de linha
+        draw_wrapped_text(c, resposta_texto, 2 * cm, altura - 5.5 * cm, largura - 4 * cm)
+
+        # Tabela de Aprovações
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(2 * cm, 5 * cm, "Aprovações")
+        c.setFillColor(colors.lightgrey)
+        c.rect(2 * cm, 4.5 * cm, largura - 4 * cm, 1 * cm, fill=True, stroke=False)
+        c.setFillColor(colors.black)
+        c.drawString(2.2 * cm, 4.8 * cm, "Participante")
+        c.drawString(8 * cm, 4.8 * cm, "Nome")
+        c.drawString(12 * cm, 4.8 * cm, "Assinatura")
+        c.drawString(16 * cm, 4.8 * cm, "Data")
+
+        # Linhas para assinaturas
+        c.drawString(2.2 * cm, 3.8 * cm, "Patrocinador do Projeto")
+        c.drawString(2.2 * cm, 2.3 * cm, "Gerente do Projeto")
+        
+        # Finalizar a página e criar uma nova para a próxima pergunta
+        c.showPage()
+
+    # Salvar o PDF no buffer
+    c.save()
+    buffer.seek(0)
+
+    # Retornar o PDF como resposta HTTP
+    return FileResponse(buffer, as_attachment=True, filename=f'Documentacao_Projeto_'+ projeto.nome +'.pdf')

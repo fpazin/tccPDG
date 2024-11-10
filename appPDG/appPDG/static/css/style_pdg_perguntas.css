@@ -256,3 +256,39 @@ footer {
   overflow-y: auto;
   margin-bottom: 10px; /* Espaço entre o contêiner e o campo de entrada */
 }
+/*Botão de Fechar no SideBar Complementar*/
+.btn-fechar {
+  background-color: #ff4d4d; /* Cor de fundo */
+  border: none;
+  border-radius: 5px; /* Arredondamento das bordas */
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff; /* Cor do texto */
+  cursor: pointer;
+  padding: 4px 8px; /* Espaçamento interno */
+  transition: background-color 0.2s ease-in-out;
+}
+.btn-fechar:hover {
+  color: #ff0000; /* Cor do hover, pode ajustar conforme o design */
+}
+.btn-fechar:focus {
+  outline: none;
+}
+/*Botão de Imprimir PDF no SideBar Complementar*/
+.btn-imprimir {
+  background-color: #6d64fd;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-imprimir:hover {
+  background-color: #574fd1;
+}
