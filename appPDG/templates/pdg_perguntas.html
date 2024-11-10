@@ -9,38 +9,46 @@
 </head>
 <script>
   function enviarMensagem() {
-      const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
-      const mensagemTexto = mensagemInput.value;
-      
-      fetch("{% url 'enviar_mensagem' %}", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "X-CSRFToken": "{{ csrf_token }}"
-          },
-          body: `mensagem=${encodeURIComponent(mensagemTexto)}`
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.resposta) {
-              // Cria o elemento para a resposta do assistente
-              const respostaDiv = document.createElement("div");
-              respostaDiv.textContent = `IA: ${data.resposta}`;
-              
-              // Adiciona a resposta ao final do contêiner de mensagens
-              const mensagensContainer = document.querySelector(".mensagens-container");
-              mensagensContainer.appendChild(respostaDiv);
+        const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
+        const mensagemTexto = mensagemInput.value;
 
-              // Limpa o campo de entrada
-              mensagemInput.value = '';
-              
-              // Rola automaticamente para a última mensagem adicionada
-              mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
-          } else {
-              alert("Erro ao enviar mensagem.");
-          }
-      })
-      .catch(error => console.error("Erro:", error));
+        // Adicionar a pergunta do usuário no contêiner de mensagens
+        const mensagensContainer = document.querySelector(".mensagens-container");
+        const perguntaDiv = document.createElement("div");
+        perguntaDiv.classList.add("mensagem-usuario");
+        perguntaDiv.textContent = `Você: ${mensagemTexto}`;
+        mensagensContainer.appendChild(perguntaDiv);
+
+        // Enviar a pergunta para a API
+        fetch("{% url 'enviar_mensagem' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `mensagem=${encodeURIComponent(mensagemTexto)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.resposta) {
+                // Cria o elemento para a resposta do assistente
+                const respostaDiv = document.createElement("div");
+                respostaDiv.classList.add("mensagem-ia");
+                respostaDiv.textContent = `IA: ${data.resposta}`;
+                
+                // Adiciona a resposta ao contêiner de mensagens
+                mensagensContainer.appendChild(respostaDiv);
+                
+                // Rola automaticamente para a última mensagem adicionada
+                mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
+            } else {
+                alert("Erro ao enviar mensagem.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+        
+        // Limpa o campo de entrada
+        mensagemInput.value = '';
   }
   function abrirModal() {
     document.getElementById("modal-novo-projeto").style.display = "flex";
@@ -128,13 +136,17 @@
         .catch(error => console.error("Erro ao carregar perguntas:", error));
 }
     // Função para inicializar a sidebar complementar ao carregar a página
-  function initSidebarComplementar() {
+  
+    function initSidebarComplementar() {
         const projetoId = {{ projeto.id }}; // Obtém o ID do projeto atual
         carregarPerguntas(projetoId); // Carrega as perguntas para o projeto atual
-        }
+    }
     // Chama a função de inicialização quando a página é carregada
     window.onload = initSidebarComplementar;
-  function salvarResposta(){
+    function fecharSidebarComplementar() {
+        document.querySelector(".sidebar-complementar").style.display = "none";
+    }
+    function salvarResposta(){
     const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
     const perguntaId = {{ pergunta.id }};
     const projetoId = {{ projeto.id }};      

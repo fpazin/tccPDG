@@ -251,10 +251,31 @@ footer {
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
+/*Container onde aparece a resposta da IA */
 .mensagens-container {
   max-height: 300px; /* Ajuste a altura conforme necessário */
   overflow-y: auto;
   margin-bottom: 10px; /* Espaço entre o contêiner e o campo de entrada */
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.mensagem-usuario {
+  color: #333;
+  background-color: #dfe7fd;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  align-self: flex-start;
+}
+.mensagem-ia {
+  color: #fff;
+  background-color: #6d64fd;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  align-self: flex-end;
 }
 /*Botão de Fechar no SideBar Complementar*/
 .btn-fechar {
