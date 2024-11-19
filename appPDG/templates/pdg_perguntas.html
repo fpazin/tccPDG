@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style_pdg_perguntas.css' %}">
 </head>
 <script>
-  function enviarMensagem() {
+    function enviarMensagem() {
         const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
         const mensagemTexto = mensagemInput.value;
 
@@ -50,13 +50,13 @@
         // Limpa o campo de entrada
         mensagemInput.value = '';
   }
-  function abrirModal() {
+    function abrirModal() {
     document.getElementById("modal-novo-projeto").style.display = "flex";
   }
-  function fecharModal() {
+    function fecharModal() {
     document.getElementById("modal-novo-projeto").style.display = "none";
   }
-  function salvarProjeto() {
+    function salvarProjeto() {
     const nomeProjeto = document.getElementById("nome-projeto").value;
     
     if (nomeProjeto.trim() === "") {
@@ -92,17 +92,17 @@
     .catch(error => console.error("Erro:", error));
   }
       // Funções para navegação entre perguntas
-  function irParaPerguntaAnterior(projetoId, perguntaId) {
+    function irParaPerguntaAnterior(projetoId, perguntaId) {
       if (perguntaId => 1) {
           window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId - 1}/`;
       }
   }
-  function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
+    function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
       if (perguntaId < maxPerguntaId) {
           window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId + 1}/`;
       }
   }
-  function carregarPerguntas(projetoId) {
+    function carregarPerguntas(projetoId) {
     fetch(`/projeto/${projetoId}/`)
         .then(response => {
             if (!response.ok) {
@@ -135,10 +135,9 @@
         })
         .catch(error => console.error("Erro ao carregar perguntas:", error));
 }
-    // Função para inicializar a sidebar complementar ao carregar a página
-  
+    // Função para inicializar a sidebar complementar ao carregar a página  
     function initSidebarComplementar() {
-        const projetoId = {{ projeto.id }}; // Obtém o ID do projeto atual
+        const projetoId = "{{ projeto.id }}"; // Obtém o ID do projeto atual
         carregarPerguntas(projetoId); // Carrega as perguntas para o projeto atual
     }
     // Chama a função de inicialização quando a página é carregada
@@ -146,28 +145,28 @@
     function fecharSidebarComplementar() {
         document.querySelector(".sidebar-complementar").style.display = "none";
     }
-    function salvarResposta(){
-    const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
-    const perguntaId = {{ pergunta.id }};
-    const projetoId = {{ projeto.id }};      
-    fetch("{% url 'salvar_resposta' %}", {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-        } else {
-            alert("Erro ao salvar a resposta.");
-        }
-    })
-    .catch(error => console.error("Erro:", error));
-  }
+    function salvarResposta() {
+        const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
+        const perguntaId = "{{ pergunta.id }}";
+        const projetoId = "{{ projeto.id }}";
+        fetch("{% url 'salvar_resposta' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+            } else {
+                alert("Erro ao salvar a resposta.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+    }
 </script>
 <body>
     <div class="container">
