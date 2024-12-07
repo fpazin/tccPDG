@@ -33,7 +33,7 @@ def criar_perguntas_padrao():
         "Orçamento preliminar do projeto", "Formação da Equipe", "Métodos de Comunicação?", 
         "Priorização dos métodos de comunicação", "Aquisições", "Benefícios do Projeto", 
         "Critérios de Sucesso do Projeto", "Estratégias do Controle de Qualidade", 
-        "Em caso de Problema, o que fazer? Construção da Matriz"
+        "Em caso de Problema, o que fazer? Construção da Matriz RACI"
     ]
     for texto in perguntas_texto:
         Pergunta.objects.get_or_create(texto=texto)

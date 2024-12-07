@@ -1,5 +1,4 @@
 import openai
-from django.http import JsonResponse
 from dotenv import load_dotenv, find_dotenv
 
 _ = load_dotenv(find_dotenv())
@@ -7,6 +6,7 @@ _ = load_dotenv(find_dotenv())
 client = openai.Client()
 
 def geracao_texto(mensagens):
+    
     resposta = client.chat.completions.create(
         messages=mensagens,
         model='gpt-3.5-turbo-0125',
@@ -17,14 +17,13 @@ def geracao_texto(mensagens):
 
     texto_completo = ''
     for resposta_stream in resposta:
+        print(resposta_stream.choices[0].delta.content)
         texto = resposta_stream.choices[0].delta.content
         if texto:
+            print(texto_completo)
             texto_completo += texto
     
+    print(texto)
     mensagens.append({'role': 'IA: ', 'content': texto_completo})
-    return texto_completo
 
-
-
-
-
+    return mensagens

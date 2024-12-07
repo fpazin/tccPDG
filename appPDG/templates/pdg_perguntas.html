@@ -181,8 +181,8 @@
             <div class="sidebar-footer">
                 {% if user.is_authenticated %}
                     <p>Olá, {{ user.username | title }} !</p>
-                    <button onclick="window.location.href={% url 'PDG' %}">Início</button>    
-                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Sair</button>
+                    <button onclick="window.location.href={% url 'PDG' %};">Início</button>    
+                    <button onclick="window.location.href='{% url 'logout' %}';" class="log-out">Sair</button>
                 {% else %}
                     <a href="{% url 'login' %}" class="log-in">Log in</a>
                 {% endif %}

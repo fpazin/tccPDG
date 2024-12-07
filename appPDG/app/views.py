@@ -11,6 +11,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors, utils
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 import io, os
 
 # Create your views here.
@@ -142,33 +144,70 @@ def gerar_pdf(request, projeto_id):
     largura, altura = A4
 
     for i, pergunta in enumerate(perguntas, start=1):
+        # Reiniciar altura ao início de cada página
+        altura_disponivel = altura - 2 * cm  # Altura inicial padrão para cada página
+        
         # Cabeçalho do documento
         c.setFont("Helvetica-Bold", 14)
-        c.drawString(2 * cm, altura - 2 * cm, "PDG – Project Documentation Generator")
+        c.drawString(2 * cm, altura_disponivel, "PDG – Project Documentation Generator")
+        altura_disponivel -= 0.7 * cm  # Reduzir espaço após o cabeçalho
+        
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(2 * cm, altura - 2.7 * cm, f"Nome do Projeto: {projeto.nome}")
+        c.drawString(2 * cm, altura_disponivel, f"Nome do Projeto: {projeto.nome}")
+        altura_disponivel -= 1.3 * cm  # Espaço para o logo e próximo conteúdo
 
         # Logo
-        logo_path = os.path.join(settings.BASE_DIR, 'appPDG', 'static', 'images', 'imagemPDG4.png')  # Substitua pelo caminho correto
-        c.drawImage(logo_path, largura - 5 * cm, altura - 3 * cm, width=3 * cm, height=2 * cm)
-        #c.drawString(largura - 4 * cm, altura - 2 * cm, "SUA LOGO")
-        
+        logo_path = os.path.join(settings.BASE_DIR, 'appPDG', 'static', 'images', 'imagemPDG4.png')
+        c.drawImage(logo_path, largura - 5 * cm, altura_disponivel, width=3 * cm, height=2 * cm)
+        altura_disponivel -= 2.5 * cm  # Espaço reservado para o logo
+
+        # Linha de separação
+        c.setLineWidth(0.5)  # Espessura da linha
+        c.line(2 * cm, altura_disponivel + 1.5 * cm, largura - 2 * cm, altura_disponivel + 1.5 * cm)
+        altura_disponivel -= 0.5 * cm  # Ajustar espaço após a linha
+
         # Pergunta e Resposta
         c.setFont("Helvetica-Bold", 14)
-        c.drawString(2 * cm, altura - 4 * cm, f"{i} Pergunta: “{pergunta.texto}”")
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(2 * cm, altura - 5 * cm, "Resposta:")
-        c.setFont("Helvetica", 10)
-        resposta_texto = respostas.get(pergunta.id, "<Nenhuma resposta foi registrada para esta pergunta...>")
-        #c.drawString(2 * cm, altura - 5.5 * cm, resposta_texto)
-        def draw_wrapped_text(c, text, x, y, max_width):
-            lines = utils.simpleSplit(text, "Helvetica", 10, max_width)
-            for line in lines:
-                c.drawString(x, y, line)
-                y -= 12  # Ajuste para a próxima linha
+        c.drawString(2 * cm, altura_disponivel + 1 * cm, f"Tópico: {i}  “{pergunta.texto}”")
+        altura_disponivel -= 1 * cm  # Espaço após o tópico
 
-        # Chamar a função de quebra de linha
-        draw_wrapped_text(c, resposta_texto, 2 * cm, altura - 5.5 * cm, largura - 4 * cm)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(2 * cm, altura_disponivel + 1 * cm, "Conteúdo Salvo:")
+        altura_disponivel -= 1 * cm  # Espaço para o conteúdo
+
+        # Conteúdo Justificado
+        resposta_texto = respostas.get(pergunta.id)
+        if not resposta_texto:  # Se a resposta for None ou vazia
+            resposta_texto = "<Nenhum conteúdo foi registrado para este tópico...>"
+        styles = getSampleStyleSheet()
+        style_justified = styles['BodyText']
+        style_justified.alignment = 4  # 4 indica justificação total
+
+        # Criar o parágrafo justificado
+        p = Paragraph(resposta_texto, style_justified)
+        text_width = largura - 4 * cm
+
+        # Verificar se há espaço na página atual
+        needed_height = p.wrap(text_width, altura_disponivel)[1]
+        if altura_disponivel - needed_height < 2 * cm:  # Se não couber, crie nova página
+            c.showPage()
+            altura_disponivel = altura - 2 * cm  # Reiniciar altura na nova página
+            c.setFont("Helvetica-Bold", 14)
+            c.drawString(2 * cm, altura_disponivel, "PDG – Project Documentation Generator")
+            altura_disponivel -= 0.7 * cm
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(2 * cm, altura_disponivel, f"Nome do Projeto: {projeto.nome}")
+            altura_disponivel -= 1.3 * cm  # Ajustar para novo conteúdo
+            c.setFont("Helvetica-Bold", 14)
+            c.drawString(2 * cm, altura_disponivel, f"Tópico: {i}  “{pergunta.texto}”")
+            altura_disponivel -= 1 * cm
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(2 * cm, altura_disponivel, "Conteúdo Salvo:")
+            altura_disponivel -= 1 * cm
+
+        # Posicione o texto na página
+        p.drawOn(c, 2 * cm, altura_disponivel - needed_height + 1.5 * cm)
+        altura_disponivel -= needed_height + 3 * cm  # Ajuste para próximo conteúdo
 
         # Tabela de Aprovações
         c.setFont("Helvetica-Bold", 10)
