@@ -75,14 +75,14 @@ Antes de executar o projeto, certifique-se de que você tem os seguintes requisi
    python manage.py runserver
    ```
 
-Agora o projeto estará rodando em `http://localhost:8000/`.
+Agora o projeto estará rodando em `http://localhost:8080/`.
 
 ## Como Usar
 
 - Criar a conta
 - Acessar a Plataforma
 - Criar Novo Projeto
-- Passar por todos os tópicos
+- Passar por todos os tópicos do Projeto
 - Gerar o PDF
 
 ## Estrutura do Projeto
@@ -98,7 +98,6 @@ TCCPDG/
 │   ├── templates/           # Templates HTML
 │   └── views.py             # Lógica das views do Django
 ├── static/                  # Arquivos estáticos compartilhados
-├── templates/               # Templates HTML compartilhados
 ├── .env                     # Variáveis de ambiente
 └── requirements.txt         # Dependências do projeto
 ```
