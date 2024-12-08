@@ -8,47 +8,62 @@
     <link rel="stylesheet" href="{% static 'css/style_pdg_perguntas.css' %}">
 </head>
 <script>
-  function enviarMensagem() {
-      const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
-      const mensagemTexto = mensagemInput.value;
-      
-      fetch("{% url 'enviar_mensagem' %}", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "X-CSRFToken": "{{ csrf_token }}"
-          },
-          body: `mensagem=${encodeURIComponent(mensagemTexto)}`
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.resposta) {
-              // Cria o elemento para a resposta do assistente
-              const respostaDiv = document.createElement("div");
-              respostaDiv.textContent = `IA: ${data.resposta}`;
-              
-              // Adiciona a resposta ao final do contêiner de mensagens
-              const mensagensContainer = document.querySelector(".mensagens-container");
-              mensagensContainer.appendChild(respostaDiv);
+    function enviarMensagem() {
+        const mensagemInput = document.querySelector("input[placeholder='Digite sua mensagem...']");
+        const mensagemTexto = mensagemInput.value;
 
-              // Limpa o campo de entrada
-              mensagemInput.value = '';
-              
-              // Rola automaticamente para a última mensagem adicionada
-              mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
-          } else {
-              alert("Erro ao enviar mensagem.");
-          }
-      })
-      .catch(error => console.error("Erro:", error));
+        // Adicionar a pergunta do usuário no contêiner de mensagens
+        const mensagensContainer = document.querySelector(".mensagens-container");
+        const perguntaDiv = document.createElement("div");
+        perguntaDiv.classList.add("mensagem-usuario");
+        perguntaDiv.textContent = `Você: ${mensagemTexto}`;
+        mensagensContainer.appendChild(perguntaDiv);
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                // Impede o comportamento padrão de envio do formulário, se houver
+                event.preventDefault();
+                // Aciona o botão programaticamente
+                document.querySelector(".btn-enviar").click();
+            }
+        });
+        // Enviar a pergunta para a API
+        fetch("{% url 'enviar_mensagem' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `mensagem=${encodeURIComponent(mensagemTexto)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.resposta) {
+                // Cria o elemento para a resposta do assistente
+                const respostaDiv = document.createElement("div");
+                respostaDiv.classList.add("mensagem-ia");
+                respostaDiv.textContent = `IA: ${data.resposta}`;
+                
+                // Adiciona a resposta ao contêiner de mensagens
+                mensagensContainer.appendChild(respostaDiv);
+                
+                // Rola automaticamente para a última mensagem adicionada
+                mensagensContainer.scrollTop = mensagensContainer.scrollHeight;
+            } else {
+                alert("Erro ao enviar mensagem.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+        
+        // Limpa o campo de entrada
+        mensagemInput.value = '';
   }
-  function abrirModal() {
+    function abrirModal() {
     document.getElementById("modal-novo-projeto").style.display = "flex";
   }
-  function fecharModal() {
+    function fecharModal() {
     document.getElementById("modal-novo-projeto").style.display = "none";
   }
-  function salvarProjeto() {
+    function salvarProjeto() {
     const nomeProjeto = document.getElementById("nome-projeto").value;
     
     if (nomeProjeto.trim() === "") {
@@ -84,17 +99,17 @@
     .catch(error => console.error("Erro:", error));
   }
       // Funções para navegação entre perguntas
-  function irParaPerguntaAnterior(projetoId, perguntaId) {
+    function irParaPerguntaAnterior(projetoId, perguntaId) {
       if (perguntaId => 1) {
           window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId - 1}/`;
       }
   }
-  function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
+    function irParaProximaPergunta(projetoId, perguntaId, maxPerguntaId) {
       if (perguntaId < maxPerguntaId) {
           window.location.href = `/PDG_Pergunta/${projetoId}/${perguntaId + 1}/`;
       }
   }
-  function carregarPerguntas(projetoId) {
+    function carregarPerguntas(projetoId) {
     fetch(`/projeto/${projetoId}/`)
         .then(response => {
             if (!response.ok) {
@@ -121,33 +136,139 @@
             });
 
             // Mostrar a sidebar complementar se estiver oculta
-            document.querySelector(".sidebar-complementar").style.display = "block";
+            //document.querySelector(".sidebar-complementar").style.display = "block";
+            const sidebarComplementar = document.querySelector(".sidebar-complementar");
+            sidebarComplementar.style.display = "block";
         })
         .catch(error => console.error("Erro ao carregar perguntas:", error));
+}
+    // Função para inicializar a sidebar complementar ao carregar a página  
+    function initSidebarComplementar() {
+        const projetoId = "{{ projeto.id }}"; // Obtém o ID do projeto atual
+        carregarPerguntas(projetoId); // Carrega as perguntas para o projeto atual
     }
-  function salvarResposta(){
-    const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
-    const perguntaId = {{ pergunta.id }};
-    const projetoId = {{ projeto.id }};      
-    fetch("{% url 'salvar_resposta' %}", {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-        } else {
-            alert("Erro ao salvar a resposta.");
+    // Chama a função de inicialização quando a página é carregada
+    window.onload = initSidebarComplementar;
+    function fecharSidebarComplementar() {
+        document.querySelector(".sidebar-complementar").style.display = "none";
+    }
+    function salvarResposta() {
+        const respostaTexto = document.querySelector("textarea[name='resposta_texto']").value;
+        const perguntaId = "{{ pergunta.id }}";
+        const projetoId = "{{ projeto.id }}";
+        fetch("{% url 'salvar_resposta' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `resposta_texto=${encodeURIComponent(respostaTexto)}&pergunta_id=${perguntaId}&projeto_id=${projetoId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+            } else {
+                alert("Erro ao salvar a resposta.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+    }
+    function confirmarConclusao(button) {
+        const confirmar = confirm("Tem certeza de que deseja concluir esta tarefa?");
+
+        if (confirmar) {
+            // Desabilitar o botão clicado
+            button.disabled = true;
+            button.textContent = "Tarefa Concluída";
+
+            // Opcional: Atualizar o status visual no sidebar
+            const parentSidebar = button.closest(".sidebar-complementar");
+            if (parentSidebar) {
+                const tarefaConcluidaMsg = document.createElement("p");
+                tarefaConcluidaMsg.textContent = "Tarefa concluída!";
+                tarefaConcluidaMsg.style.color = "green";
+                parentSidebar.appendChild(tarefaConcluidaMsg);
+            }
+
+            // Enviar a confirmação para o servidor
+            const perguntaId = "{{ pergunta.id }}"; // Substituir pela variável correta
+            fetch(`/concluir_tarefa/${perguntaId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ concluida: true }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erro ao concluir a tarefa");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Tarefa concluída com sucesso!");
+                } else {
+                    alert("Erro ao concluir a tarefa. Tente novamente.");
+                }
+            })
+            .catch(error => console.error("Erro:", error));
         }
-    })
-    .catch(error => console.error("Erro:", error));
-  }
-  </script>
+    }
+    //Desabilitando o botão de concluir tarefa na sidebar
+    function confirmarConclusao() {
+        if (confirm("Tem certeza de que deseja concluir esta tarefa?")) {
+            concluirTarefa();
+        }
+    }
+    function concluirTarefa(button) {
+        const perguntaId = button.getAttribute("data-id");
+
+        // Enviar solicitação para marcar como concluída
+        fetch(`/concluir_tarefa/${perguntaId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ concluida: true }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Tarefa concluída!");
+
+                // Desabilitar botão atual
+                button.disabled = true;
+                button.textContent = "Tarefa Concluída";
+
+                // Atualizar link na sidebar
+                const link = document.querySelector(`a[data-id='${perguntaId}']`);
+                if (link) {
+                    link.classList.add("disabled");
+                    link.style.pointerEvents = "none";
+                    link.style.color = "gray";
+                }
+            } else {
+                alert("Erro ao concluir a tarefa. Tente novamente.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+    }
+    function desabilitarBotaoSidebar(perguntaId) {
+        // Localizar o botão correspondente na sidebar usando o atributo data-id
+        const botao = document.querySelector(`.sidebar-complementar a[data-id='${perguntaId}']`);
+        if (botao) {
+            // Adicionar classe para desabilitar
+            botao.classList.add("disabled");
+            botao.style.pointerEvents = "none"; // Impedir cliques
+            botao.style.color = "gray"; // Alterar cor para indicar estado desabilitado
+            botao.textContent += " (Concluída)"; // Adicionar texto indicativo
+        }
+    }
+</script>
 <body>
     <div class="container">
         <!-- Sidebar Principal -->
@@ -161,14 +282,13 @@
             <div class="sidebar-footer">
                 {% if user.is_authenticated %}
                     <p>Olá, {{ user.username | title }} !</p>
-                    <button onclick="window.location.href={% url 'PDG' %}">Início</button>    
-                    <button onclick="window.location.href='{% url 'logout' %}'" class="log-out">Sair</button>
+                    <button onclick="window.location.href={% url 'PDG' %};">Início</button>    
+                    <button onclick="window.location.href='{% url 'logout' %}';" class="log-out">Sair</button>
                 {% else %}
                     <a href="{% url 'login' %}" class="log-in">Log in</a>
                 {% endif %}
             </div>
         </aside>
-
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Section with Textarea and Save Button -->
@@ -181,7 +301,17 @@
                     <button type="button" onclick="irParaPerguntaAnterior({{ projeto.id }}, {{ pergunta.id }})" class="btn-previous">Pergunta Anterior</button>
                     <button type="submit" onclick="salvarResposta()" class="btn-salvar">Salvar</button>
                     <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
+                    <!--<button class="btn-concluir-tarefa" onclick="confirmarConclusao()">Concluir Tarefa</button> -->
+                    <button class="btn-concluir-tarefa" data-id="{{ pergunta.id }}" onclick="concluirTarefa(this)">Concluir Tarefa</button>
+
                 </form>
+                <!-- Área para exibir a resposta registrada, se houver -->
+                {% if resposta.resposta_texto %}
+                <div class="resposta-registrada">
+                    <h3>Resposta Registrada:</h3>
+                    <p>{{ resposta.resposta_texto }}</p>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Bottom Section with Interaction Area -->
@@ -196,8 +326,30 @@
         </main>
         <!-- Sidebar Complementar -->
         <aside class="sidebar-complementar" style="display: none;">
-            <h2>Projeto Selecionado</h2>
-            <ul></ul>
+            <div class="sidebar-header">
+                <h2>Projeto Selecionado</h2>
+                <button onclick="fecharSidebarComplementar()" class="btn-fechar">X</button>
+            </div>
+            <ul>    
+                {% for pergunta in perguntas %}
+                    <li>
+                        <a href="/PDG_Pergunta/{{ projeto.id }}/{{ pergunta.id }}/"
+                            data-id="{{ pergunta.id }}"
+                            class="sidebar-link {% if pergunta.concluida %}disabled{% endif %}">
+                            {{ pergunta.texto }}
+                        </a>
+                        <!-- Botão para concluir tarefa -->
+                        {% if not pergunta.concluida %}
+                        <button class="btn-concluir-tarefa" data-id="{{ pergunta.id }}" onclick="concluirTarefa(this)">
+                            Concluir Tarefa
+                        </button>
+                        {% else %}
+                        <button class="btn-concluir-tarefa" disabled>Tarefa Concluída</button>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'imprimir_pdf' projeto.id %}" class="btn-imprimir" target="_blank">Imprimir PDF</a>
         </aside>
         <!-- Modal para Criar Novo Projeto -->
         <div id="modal-novo-projeto" class="modal" style="display: none;">
