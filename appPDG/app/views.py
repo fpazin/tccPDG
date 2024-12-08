@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import Projeto, Pergunta, Resposta
 from django.views import View
@@ -13,7 +14,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-import io, os
+import io, os, json
 
 # Create your views here.
 # Região de Testes
@@ -53,7 +54,7 @@ def salvar_projeto(request):
                 "Orçamento preliminar do projeto", "Formação da Equipe", "Métodos de Comunicação?", 
                 "Priorização dos métodos de comunicação", "Aquisições", "Benefícios do Projeto", 
                 "Critérios de Sucesso do Projeto", "Estratégias do Controle de Qualidade", 
-                "Em caso de Problema, o que fazer? Construção da Matriz"
+                "Em caso de Problema, o que fazer? Construção da Matriz RACI"
             ]
             
             for texto in perguntas_texto:
@@ -233,3 +234,23 @@ def gerar_pdf(request, projeto_id):
 
     # Retornar o PDF como resposta HTTP
     return FileResponse(buffer, as_attachment=True, filename=f'Documentacao_Projeto_'+ projeto.nome +'.pdf')
+
+# Concluir Pergunta/Tarefa
+
+@csrf_exempt
+def concluir_tarefa(request, pergunta_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            pergunta = Pergunta.objects.get(id=pergunta_id)
+            pergunta.concluida = data.get("concluida", False)
+            pergunta.save()
+            return JsonResponse({"status": "success", "message": "Tarefa concluída com sucesso!"})
+        except Pergunta.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Pergunta não encontrada."}, status=404)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Método não permitido."}, status=405)
+
+
+

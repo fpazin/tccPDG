@@ -12,6 +12,7 @@ class Projeto(models.Model):
 class Pergunta(models.Model):
     projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE, related_name="perguntas")  # Nova relação com Projeto
     texto = models.TextField()
+    concluida = models.BooleanField(default=False)  # Novo campo para marcar se a pergunta foi respondida
 
     def __str__(self):
         return self.texto

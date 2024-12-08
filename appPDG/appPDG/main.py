@@ -17,13 +17,10 @@ def geracao_texto(mensagens):
 
     texto_completo = ''
     for resposta_stream in resposta:
-        print(resposta_stream.choices[0].delta.content)
         texto = resposta_stream.choices[0].delta.content
         if texto:
-            print(texto_completo)
             texto_completo += texto
     
-    print(texto)
     mensagens.append({'role': 'IA: ', 'content': texto_completo})
 
-    return mensagens
+    return texto_completo

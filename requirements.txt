@@ -8,3 +8,6 @@ Django
 openai
 python-dotenv
 reportlab
+django-allauth
+requests
+jwt

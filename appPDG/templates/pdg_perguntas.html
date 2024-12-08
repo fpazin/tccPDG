@@ -18,7 +18,14 @@
         perguntaDiv.classList.add("mensagem-usuario");
         perguntaDiv.textContent = `Você: ${mensagemTexto}`;
         mensagensContainer.appendChild(perguntaDiv);
-
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                // Impede o comportamento padrão de envio do formulário, se houver
+                event.preventDefault();
+                // Aciona o botão programaticamente
+                document.querySelector(".btn-enviar").click();
+            }
+        });
         // Enviar a pergunta para a API
         fetch("{% url 'enviar_mensagem' %}", {
             method: "POST",
@@ -167,6 +174,100 @@
         })
         .catch(error => console.error("Erro:", error));
     }
+    function confirmarConclusao(button) {
+        const confirmar = confirm("Tem certeza de que deseja concluir esta tarefa?");
+
+        if (confirmar) {
+            // Desabilitar o botão clicado
+            button.disabled = true;
+            button.textContent = "Tarefa Concluída";
+
+            // Opcional: Atualizar o status visual no sidebar
+            const parentSidebar = button.closest(".sidebar-complementar");
+            if (parentSidebar) {
+                const tarefaConcluidaMsg = document.createElement("p");
+                tarefaConcluidaMsg.textContent = "Tarefa concluída!";
+                tarefaConcluidaMsg.style.color = "green";
+                parentSidebar.appendChild(tarefaConcluidaMsg);
+            }
+
+            // Enviar a confirmação para o servidor
+            const perguntaId = "{{ pergunta.id }}"; // Substituir pela variável correta
+            fetch(`/concluir_tarefa/${perguntaId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ concluida: true }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erro ao concluir a tarefa");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Tarefa concluída com sucesso!");
+                } else {
+                    alert("Erro ao concluir a tarefa. Tente novamente.");
+                }
+            })
+            .catch(error => console.error("Erro:", error));
+        }
+    }
+    //Desabilitando o botão de concluir tarefa na sidebar
+    function confirmarConclusao() {
+        if (confirm("Tem certeza de que deseja concluir esta tarefa?")) {
+            concluirTarefa();
+        }
+    }
+    function concluirTarefa(button) {
+        const perguntaId = button.getAttribute("data-id");
+
+        // Enviar solicitação para marcar como concluída
+        fetch(`/concluir_tarefa/${perguntaId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ concluida: true }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Tarefa concluída!");
+
+                // Desabilitar botão atual
+                button.disabled = true;
+                button.textContent = "Tarefa Concluída";
+
+                // Atualizar link na sidebar
+                const link = document.querySelector(`a[data-id='${perguntaId}']`);
+                if (link) {
+                    link.classList.add("disabled");
+                    link.style.pointerEvents = "none";
+                    link.style.color = "gray";
+                }
+            } else {
+                alert("Erro ao concluir a tarefa. Tente novamente.");
+            }
+        })
+        .catch(error => console.error("Erro:", error));
+    }
+    function desabilitarBotaoSidebar(perguntaId) {
+        // Localizar o botão correspondente na sidebar usando o atributo data-id
+        const botao = document.querySelector(`.sidebar-complementar a[data-id='${perguntaId}']`);
+        if (botao) {
+            // Adicionar classe para desabilitar
+            botao.classList.add("disabled");
+            botao.style.pointerEvents = "none"; // Impedir cliques
+            botao.style.color = "gray"; // Alterar cor para indicar estado desabilitado
+            botao.textContent += " (Concluída)"; // Adicionar texto indicativo
+        }
+    }
 </script>
 <body>
     <div class="container">
@@ -200,6 +301,9 @@
                     <button type="button" onclick="irParaPerguntaAnterior({{ projeto.id }}, {{ pergunta.id }})" class="btn-previous">Pergunta Anterior</button>
                     <button type="submit" onclick="salvarResposta()" class="btn-salvar">Salvar</button>
                     <button type="button" onclick="irParaProximaPergunta({{ projeto.id }}, {{ pergunta.id }}, {{ max_pergunta_id }})" class="btn-next">Próxima Pergunta</button>
+                    <!--<button class="btn-concluir-tarefa" onclick="confirmarConclusao()">Concluir Tarefa</button> -->
+                    <button class="btn-concluir-tarefa" data-id="{{ pergunta.id }}" onclick="concluirTarefa(this)">Concluir Tarefa</button>
+
                 </form>
                 <!-- Área para exibir a resposta registrada, se houver -->
                 {% if resposta.resposta_texto %}
@@ -226,7 +330,25 @@
                 <h2>Projeto Selecionado</h2>
                 <button onclick="fecharSidebarComplementar()" class="btn-fechar">X</button>
             </div>
-            <ul></ul>
+            <ul>    
+                {% for pergunta in perguntas %}
+                    <li>
+                        <a href="/PDG_Pergunta/{{ projeto.id }}/{{ pergunta.id }}/"
+                            data-id="{{ pergunta.id }}"
+                            class="sidebar-link {% if pergunta.concluida %}disabled{% endif %}">
+                            {{ pergunta.texto }}
+                        </a>
+                        <!-- Botão para concluir tarefa -->
+                        {% if not pergunta.concluida %}
+                        <button class="btn-concluir-tarefa" data-id="{{ pergunta.id }}" onclick="concluirTarefa(this)">
+                            Concluir Tarefa
+                        </button>
+                        {% else %}
+                        <button class="btn-concluir-tarefa" disabled>Tarefa Concluída</button>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
             <a href="{% url 'imprimir_pdf' projeto.id %}" class="btn-imprimir" target="_blank">Imprimir PDF</a>
         </aside>
         <!-- Modal para Criar Novo Projeto -->
