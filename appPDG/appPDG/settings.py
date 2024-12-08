@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
+import os
 
 _ = load_dotenv(find_dotenv())
 
@@ -28,7 +29,7 @@ SECRET_KEY = 'django-insecure-0riqn8tp6^04ykb9_p#0++%nhwrf5%(bkdok(q=3*%zal!6qy!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']	# Altere para ['*'] para permitir acesso de qualquer host
+ALLOWED_HOSTS = ['https://tccpdg.fly.dev/','localhost', 'tccpdg.herokuapp.com']	# Altere para ['*'] para permitir acesso de qualquer host
 
 
 # Application definition
@@ -129,6 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     BASE_DIR / "appPDG/static",  # Garanta que esta linha esteja correta
