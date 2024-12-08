@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
+
+_ = load_dotenv(find_dotenv())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,7 @@ SECRET_KEY = 'django-insecure-0riqn8tp6^04ykb9_p#0++%nhwrf5%(bkdok(q=3*%zal!6qy!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']	# Altere para ['*'] para permitir acesso de qualquer host
 
 
 # Application definition
@@ -39,6 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'accounts',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'appPDG.urls'
@@ -101,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SITE_ID = 1
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -127,3 +138,32 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuração do Django Allauth
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'allauth.account.auth_backends.AuthenticationBackend', # added for allauth
+)
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '676805774473-dq2dk6uu0mg42d84qu60kffiv3mp4lkc.apps.googleusercontent.com',
+            'secret': '',
+            'key': ''
+        },
+        'SCOPE': ['profile','email'],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        },
+    }
+}
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'PDG'
+LOGOUT_REDIRECT_URL = 'login'
+ACCOUNT_LOGOUT_REDIRECT = 'login'
+SOCIALACCOUNT_LOGIN_ON_GET = True

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+{% load socialaccount %}
 <style>
   body {
     background-color: #e6e9fc; /* mesma cor de fundo da página de login */    
@@ -53,9 +54,7 @@
     <button type="submit" class="btn">Cadastrar</button>
     <a href="{% url 'login' %}" class="signup">Já tem uma conta? Faça login</a>
     <div class="divider"></div>
-    <button type="button" class="btn google-login">
-      Ou faça login com o Google
-    </button>
+
   </form>
 </div>
 

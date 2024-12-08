@@ -215,7 +215,7 @@ footer {
 .sidebar-complementar {
   width: 250px;
   background-color: #2c2c2c;
-  padding: 20px;
+  padding: 17px;
   color: white;
   position: fixed;
   right: 0;
@@ -251,8 +251,120 @@ footer {
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
+/*Container onde aparece a resposta da IA */
 .mensagens-container {
-  max-height: 300px; /* Ajuste a altura conforme necessário */
+  max-height: 600px; /* Ajuste a altura conforme necessário */
   overflow-y: auto;
-  margin-bottom: 10px; /* Espaço entre o contêiner e o campo de entrada */
+  margin-bottom: 12px; /* Espaço entre o contêiner e o campo de entrada */
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
+.mensagem-usuario {
+  color: #333;
+  background-color: #dfe7fd;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  align-self: flex-start;
+}
+.mensagem-ia {
+  color: #fff;
+  background-color: #6d64fd;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  align-self: flex-end;
+}
+/*Botão de Fechar no SideBar Complementar*/
+.btn-fechar {
+  background-color: #ff4d4d; /* Cor de fundo */
+  border: none;
+  border-radius: 5px; /* Arredondamento das bordas */
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff; /* Cor do texto */
+  cursor: pointer;
+  padding: 4px 8px; /* Espaçamento interno */
+  transition: background-color 0.2s ease-in-out;
+}
+.btn-fechar:hover {
+  color: #ff0000; /* Cor do hover, pode ajustar conforme o design */
+}
+.btn-fechar:focus {
+  outline: none;
+}
+/*Botão de Imprimir PDF no SideBar Complementar*/
+.btn-imprimir {
+  background-color: #6d64fd;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-imprimir:hover {
+  background-color: #574fd1;
+}
+
+.resposta-registrada {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #333;
+}
+
+.resposta-registrada h3 {
+  margin-top: 0;
+  font-size: 1.1em;
+  color: #555;
+}
+
+.resposta-registrada p {
+  margin: 0;
+  font-size: 1em;
+  color: #333;
+}
+
+/*Botão de Concluir Tarefa*/
+.btn-concluir-tarefa {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1em;
+  margin-top: 10px;
+}
+
+.btn-concluir-tarefa:hover {
+  background-color: #e68900;
+}
+
+.btn-concluir-tarefa:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+.sidebar-complementar a.disabled {
+  pointer-events: none !important;
+  color: gray !important;
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+a.disabled {
+  color: gray;
+  pointer-events: none; /* Impedir click */
+  text-decoration: line-through; /* Indicar que está desabilitado */
+}
+/*FIM*/
