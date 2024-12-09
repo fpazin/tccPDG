@@ -9,5 +9,6 @@ openai
 python-dotenv
 reportlab
 django-allauth
+gunicorn
 requests
 jwt

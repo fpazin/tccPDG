@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0riqn8tp6^04ykb9_p#0++%nhwrf5%(bkdok(q=3*%zal!6qy!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['https://tccpdg.fly.dev/','localhost', 'tccpdg.herokuapp.com']	# Altere para ['*'] para permitir acesso de qualquer host
-
+#ALLOWED_HOSTS = ["https://tccpdg.fly.dev/","localhost", "tccpdg.herokuapp.com", "https://*.fly.dev/"]	# Altere para ['*'] para permitir acesso de qualquer host
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -67,7 +67,7 @@ ROOT_URLCONF = 'appPDG.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],  # Garanta que esta linha esteja correta
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,7 +133,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    BASE_DIR / "appPDG/static",  # Garanta que esta linha esteja correta
+    BASE_DIR / "appPDG/static", 
 ]
 
 # Default primary key field type
